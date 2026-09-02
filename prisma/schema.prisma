@@ -1,0 +1,293 @@
+// Segrr - Prisma Schema (Phase 0)
+// 要件定義書 v1.0 セクション2・4 に基づく初期案
+// 生成日: 2026-09-02
+//
+// 方針:
+// - Organization を最初から入れる(将来のマルチテナント対応のため)
+// - Quote → Contract → Invoice のデータ継承は「参照+コピー」方式
+//   (明細行は作成時にコピーし、元の伝票への参照IDも保持する)
+// - Invoice : Contract = 1:N(分割請求対応)。合計金額の超過チェックはアプリ層で行う
+// - Phase 1 (計画書/覚書/受注表/タスク管理表/領収書) はコメントアウトで骨格のみ記載
+
+// 補足: amount カラムは初期マイグレーション後に生成列(GENERATED COLUMN)へ
+// 置き換える想定。詳細は docs/db-constraints.sql を参照。
+// Prisma Client側では amount を書き込み対象から除外すること。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────
+// 組織・ユーザー(マルチテナント基盤)
+// ─────────────────────────────
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+  customers   Customer[]
+  projects    Project[]
+  quotes      Quote[]
+  contracts   Contract[]
+  invoices    Invoice[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  memberships Membership[]
+}
+
+enum MembershipRole {
+  OWNER
+  MEMBER
+  VIEWER
+}
+
+model Membership {
+  id             String         @id @default(cuid())
+  organizationId String
+  userId         String
+  role           MembershipRole @default(OWNER)
+  createdAt      DateTime       @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, userId])
+}
+
+// ─────────────────────────────
+// 顧客・案件
+// ─────────────────────────────
+
+model Customer {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  contactName    String?
+  email          String?
+  phone          String?
+  address        String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  projects     Project[]
+
+  @@index([organizationId])
+}
+
+enum ProjectStatus {
+  LEAD        // 見込み
+  QUOTING     // 見積中
+  CONTRACTED  // 契約済
+  IN_PROGRESS // 進行中
+  INVOICED    // 請求済(一部含む)
+  COMPLETED   // 完了
+  CANCELLED   // 中止
+}
+
+model Project {
+  id             String        @id @default(cuid())
+  organizationId String
+  customerId     String
+  name           String
+  status         ProjectStatus @default(LEAD)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  quotes       Quote[]
+  contracts    Contract[]
+
+  @@index([organizationId])
+  @@index([customerId])
+}
+
+// ─────────────────────────────
+// 見積書
+// ─────────────────────────────
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model Quote {
+  id             String      @id @default(cuid())
+  organizationId String
+  projectId      String
+  number         String      // 見積番号(表示用。組織内で一意)
+  status         QuoteStatus @default(DRAFT)
+  issueDate      DateTime?
+  expiryDate     DateTime?
+  totalAmount    Int         @default(0) // 明細合計。円単位の整数で管理
+  notes          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  project      Project      @relation(fields: [projectId], references: [id])
+  items        QuoteItem[]
+  contracts    Contract[]   // この見積から作られた契約(複数見積比較などを見据え配列)
+
+  @@unique([organizationId, number])
+  @@index([projectId])
+}
+
+model QuoteItem {
+  id        String  @id @default(cuid())
+  quoteId   String
+  name      String
+  description String?
+  quantity  Int     @default(1)
+  unitPrice Int
+  amount    Int     // quantity * unitPrice(整合性はアプリ層で担保)
+  sortOrder Int     @default(0)
+
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────
+// 契約書
+// ─────────────────────────────
+
+enum ContractStatus {
+  DRAFT
+  SENT
+  SIGNED
+  CANCELLED
+}
+
+model Contract {
+  id             String         @id @default(cuid())
+  organizationId String
+  projectId      String
+  sourceQuoteId  String?        // どの見積から作成したか(手動作成の場合はnull)
+  number         String
+  status         ContractStatus @default(DRAFT)
+  contractDate   DateTime?
+  totalAmount    Int            @default(0)
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  project      Project         @relation(fields: [projectId], references: [id])
+  sourceQuote  Quote?          @relation(fields: [sourceQuoteId], references: [id])
+  items        ContractItem[]
+  invoices     Invoice[]       // 1契約:N請求書(分割請求対応)
+
+  @@unique([organizationId, number])
+  @@index([projectId])
+}
+
+model ContractItem {
+  id              String  @id @default(cuid())
+  contractId      String
+  sourceQuoteItemId String? // 継承元の見積明細(あれば)
+  name            String
+  description     String?
+  quantity        Int     @default(1)
+  unitPrice       Int
+  amount          Int
+  sortOrder       Int     @default(0)
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────
+// 請求書(1契約:N請求書 / 分割請求対応)
+// ─────────────────────────────
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  organizationId String
+  contractId     String
+  number         String
+  sequenceNo     Int           @default(1) // この契約に対して何回目の請求か
+  status         InvoiceStatus @default(DRAFT)
+  issueDate      DateTime?
+  dueDate        DateTime?
+  amount         Int           @default(0)
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  contract     Contract      @relation(fields: [contractId], references: [id])
+  items        InvoiceItem[]
+
+  @@unique([organizationId, number])
+  @@unique([contractId, sequenceNo])
+  @@index([contractId])
+
+  // 要アプリ層バリデーション:
+  // 同一contractId内のInvoice(CANCELLED除く).amountの合計は
+  // contract.totalAmountを超えてはならない
+}
+
+model InvoiceItem {
+  id        String  @id @default(cuid())
+  invoiceId String
+  name      String
+  description String?
+  quantity  Int     @default(1)
+  unitPrice Int
+  amount    Int
+  sortOrder Int     @default(0)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────
+// Phase 1 以降(骨格のみ・未実装)
+// ─────────────────────────────
+//
+// model Plan {
+//   id         String @id @default(cuid())
+//   contractId String
+//   ...
+//   orderSheets OrderSheet[]
+//   taskList    TaskList[]
+// }
+//
+// model Memo {
+//   id         String @id @default(cuid())
+//   contractId String
+//   ...
+// }
+//
+// model Receipt {
+//   id        String @id @default(cuid())
+//   invoiceId String
+//   number    String
+//   issueDate DateTime?
+//   amount    Int
+//   ...
+// }
