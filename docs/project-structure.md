@@ -8,10 +8,13 @@ segrr/
 ├── docs/
 │   ├── segrr-requirements-v1.md   # 要件定義書(このリポジトリの正)
 │   ├── project-structure.md       # このファイル
-│   └── phase0-task-breakdown.md   # タスク分解
+│   ├── phase0-task-breakdown.md   # タスク分解
+│   ├── PM-instructions-for-claude-code.md # モデル運用・査読の進め方
+│   └── db-constraints.sql         # 金額・消費税・テナント整合性のDB制約
 ├── prisma/
 │   ├── schema.prisma
-│   └── seed.ts                    # 開発用シード(本人+テスターのOrganization/Membership)
+│   ├── migrations/                # db-constraints.sql は空マイグレーションに貼って履歴に残す
+│   └── seed.ts                    # 開発用シード(本人+テスターのOrganization/Membership/Invitation)
 ├── src/
 │   ├── app/
 │   │   ├── (auth)/
@@ -57,11 +60,14 @@ segrr/
 │   │   └── validators/              # zodスキーマ(フォーム入力・API入出力の型検証)
 │   ├── lib/
 │   │   ├── db.ts                    # Prisma Client シングルトン
-│   │   ├── auth.ts                  # NextAuth設定
+│   │   ├── auth.ts                  # NextAuth設定(Googleプロバイダ + 招待制チェック)
+│   │   ├── tax.ts                   # 消費税・源泉徴収の計算(UIプレビュー用。DBトリガーと同じ式)
 │   │   └── pdf.ts                   # PDF生成ユーティリティ
 │   └── types/
 ├── tests/
 │   ├── unit/                        # server/services のロジックテスト(特に金額計算・バリデーション)
+│   ├── db/                          # db-constraints.sql の検証(実DBに対して実行。A2の完了条件)
+│   │   └── verify-constraints.sql
 │   └── e2e/                         # 見積→契約→請求の一連フローのE2E
 └── .claude/
     └── commands/                    # Claude Code用カスタムコマンド(モデル切り替え等、後述)
@@ -70,4 +76,6 @@ segrr/
 ## 補足
 
 - `server/services/` にビジネスロジックを集約するのは、見積→契約→請求のデータ継承と金額バリデーションが複数画面から呼ばれるため、UIコンポーネント側にロジックを分散させないための構成です。
-- `.claude/commands/` は、`claude-model-operation-guide.md` の役割分担(Sonnet 5 / Opus 5 / Fable 5.1)を毎回指定せずに済むよう、コマンド化する想定の置き場所です(詳細は `PM-instructions-for-claude-code.md` 参照)。
+- `lib/tax.ts` はUIの即時プレビュー専用です。**金額の正はDB(`docs/db-constraints.sql` のトリガー)** で、サービス層は合計・消費税・源泉徴収のカラムを書き込みません。両者の計算結果が一致することを `tests/unit/tax.test.ts` で固定します。
+- `server/services/` の各関数は `organizationId` をセッション由来の値として引数で受け取り、リクエストボディからは決して読みません。
+- `.claude/commands/` は、モデルの役割分担(Sonnet 5 / Opus 5 / Fable 5.1)を毎回指定せずに済むよう、コマンド化する想定の置き場所です(詳細は `docs/PM-instructions-for-claude-code.md` 参照)。

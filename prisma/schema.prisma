@@ -1,17 +1,21 @@
 // Segrr - Prisma Schema (Phase 0)
-// 要件定義書 v1.0 セクション2・4 に基づく初期案
-// 生成日: 2026-09-02
+// 要件定義書 v1.0 セクション2・4 に基づく
+// 初版: 2026-09-02 / 改訂: 設計レビュー反映
 //
 // 方針:
 // - Organization を最初から入れる(将来のマルチテナント対応のため)
-// - Quote → Contract → Invoice のデータ継承は「参照+コピー」方式
-//   (明細行は作成時にコピーし、元の伝票への参照IDも保持する)
-// - Invoice : Contract = 1:N(分割請求対応)。合計金額の超過チェックはアプリ層で行う
+// - Quote → Contract → Invoice のデータ継承は「明細をコピー + 変換後は元書類を固定」方式
+//   (継承元への参照IDは追跡用に保持するが、金額の根拠にはしない)
+// - Invoice : Contract = 1:N(分割請求対応)。超過チェックはアプリ層とDBトリガーの二重
+// - 金額は円単位の Int。税抜入力を基本とし、消費税は税率(10% / 8%)ごとに集計する
 // - Phase 1 (計画書/覚書/受注表/タスク管理表/領収書) はコメントアウトで骨格のみ記載
-
-// 補足: amount カラムは初期マイグレーション後に生成列(GENERATED COLUMN)へ
-// 置き換える想定。詳細は docs/db-constraints.sql を参照。
-// Prisma Client側では amount を書き込み対象から除外すること。
+//
+// 【重要】以下のカラムはアプリから書き込まない(DBトリガーが算出する)
+//   *Item.amount
+//   Quote/Contract/Invoice の subtotal10, tax10, subtotal8, tax8,
+//                            subtotal, taxAmount, totalAmount
+//   Invoice.withholdingTax, Invoice.paymentAmount
+// トリガー定義とテナント整合性チェックは docs/db-constraints.sql を参照。
 
 generator client {
   provider = "prisma-client-js"
@@ -26,13 +30,36 @@ datasource db {
 // 組織・ユーザー(マルチテナント基盤)
 // ─────────────────────────────
 
+enum TaxRounding {
+  FLOOR // 切り捨て(既定)
+  ROUND // 四捨五入
+  CEIL  // 切り上げ
+}
+
 model Organization {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // 帳票(PDF)に印字する自社情報
+  postalCode  String?
+  address     String?
+  phone       String?
+  email       String?
+  websiteUrl  String?
+  bankAccount String? // 振込先。Phase 0 は複数行フリーテキストで運用する
+
+  // 適格請求書発行事業者の登録番号(T + 13桁)。免税事業者は null のまま運用できる
+  invoiceRegistrationNumber String?
+
+  // 消費税の既定値。端数処理は「1書類につき税率ごとに1回」適用する
+  defaultTaxRate Int         @default(10)
+  taxRounding    TaxRounding @default(FLOOR)
+
   memberships Membership[]
+  invitations Invitation[]
+  sequences   DocumentSequence[]
   customers   Customer[]
   projects    Project[]
   quotes      Quote[]
@@ -41,12 +68,16 @@ model Organization {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
 
   memberships Membership[]
+  accounts    Account[]
+  sessions    Session[]
 }
 
 enum MembershipRole {
@@ -59,13 +90,101 @@ model Membership {
   id             String         @id @default(cuid())
   organizationId String
   userId         String
-  role           MembershipRole @default(OWNER)
+  role           MembershipRole @default(MEMBER) // OWNER はシード/招待で明示的に付与する
   createdAt      DateTime       @default(now())
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+// 招待制の実体。ここに存在しないメールアドレスは組織に参加できない。
+// Phase 0 は招待UIを作らずシードで投入する(要件定義書 セクション3・失敗パターン11)。
+model Invitation {
+  id             String         @id @default(cuid())
+  organizationId String
+  email          String
+  role           MembershipRole @default(MEMBER)
+  invitedByUserId String?
+  acceptedAt     DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime       @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, email])
+  @@index([email])
+}
+
+// ─────────────────────────────
+// NextAuth (Auth.js) 標準モデル
+// Phase 0 は Google プロバイダのみ有効化するが、後から方式を足せるよう
+// アダプタ標準のテーブルを最初から用意しておく。
+// ─────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────
+// 伝票番号の採番
+// 作成と同一トランザクション内で
+//   INSERT ... ON CONFLICT (organizationId, kind, year) DO UPDATE SET last = "DocumentSequence".last + 1 RETURNING last
+// を実行する。行ロックで直列化されるため同時採番でも重複しない。
+// ─────────────────────────────
+
+enum DocumentKind {
+  QUOTE
+  CONTRACT
+  INVOICE
+}
+
+model DocumentSequence {
+  organizationId String
+  kind           DocumentKind
+  year           Int
+  last           Int          @default(0)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@id([organizationId, kind, year])
 }
 
 // ─────────────────────────────
@@ -79,6 +198,7 @@ model Customer {
   contactName    String?
   email          String?
   phone          String?
+  postalCode     String?
   address        String?
   notes          String?
   createdAt      DateTime @default(now())
@@ -113,6 +233,7 @@ model Project {
   customer     Customer     @relation(fields: [customerId], references: [id])
   quotes       Quote[]
   contracts    Contract[]
+  invoices     Invoice[]
 
   @@index([organizationId])
   @@index([customerId])
@@ -121,13 +242,14 @@ model Project {
 // ─────────────────────────────
 // 見積書
 // ─────────────────────────────
+// EXPIRED は expiryDate から導出できる派生状態のため enum に持たない
+// (保存すると更新漏れで必ずずれる。表示時に status = SENT かつ expiryDate < 今日 で判定する)
 
 enum QuoteStatus {
   DRAFT
   SENT
   ACCEPTED
   REJECTED
-  EXPIRED
 }
 
 model Quote {
@@ -138,10 +260,18 @@ model Quote {
   status         QuoteStatus @default(DRAFT)
   issueDate      DateTime?
   expiryDate     DateTime?
-  totalAmount    Int         @default(0) // 明細合計。円単位の整数で管理
   notes          String?
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+
+  // 以下はすべてトリガー算出。アプリから書き込まないこと
+  subtotal10  Int @default(0) // 10%対象の税抜合計
+  tax10       Int @default(0)
+  subtotal8   Int @default(0) // 8%(軽減税率)対象の税抜合計
+  tax8        Int @default(0)
+  subtotal    Int @default(0) // 税抜合計
+  taxAmount   Int @default(0) // 消費税額合計
+  totalAmount Int @default(0) // 税込合計
 
   organization Organization @relation(fields: [organizationId], references: [id])
   project      Project      @relation(fields: [projectId], references: [id])
@@ -153,16 +283,19 @@ model Quote {
 }
 
 model QuoteItem {
-  id        String  @id @default(cuid())
-  quoteId   String
-  name      String
+  id          String  @id @default(cuid())
+  quoteId     String
+  name        String
   description String?
-  quantity  Int     @default(1)
-  unitPrice Int
-  amount    Int     // quantity * unitPrice(整合性はアプリ層で担保)
-  sortOrder Int     @default(0)
+  quantity    Int     @default(1)
+  unitPrice   Int // 税抜単価
+  taxRate     Int     @default(10) // 10 または 8
+  amount      Int     @default(0)  // トリガー算出(quantity * unitPrice)
+  sortOrder   Int     @default(0)
 
   quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId])
 }
 
 // ─────────────────────────────
@@ -180,89 +313,123 @@ model Contract {
   id             String         @id @default(cuid())
   organizationId String
   projectId      String
-  sourceQuoteId  String?        // どの見積から作成したか(手動作成の場合はnull)
+  sourceQuoteId  String?        // どの見積から作成したか(追跡用。金額の根拠にはしない)
   number         String
   status         ContractStatus @default(DRAFT)
   contractDate   DateTime?
-  totalAmount    Int            @default(0)
   notes          String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  organization Organization    @relation(fields: [organizationId], references: [id])
-  project      Project         @relation(fields: [projectId], references: [id])
-  sourceQuote  Quote?          @relation(fields: [sourceQuoteId], references: [id])
+  // トリガー算出
+  subtotal10  Int @default(0)
+  tax10       Int @default(0)
+  subtotal8   Int @default(0)
+  tax8        Int @default(0)
+  subtotal    Int @default(0)
+  taxAmount   Int @default(0)
+  totalAmount Int @default(0)
+
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  project      Project        @relation(fields: [projectId], references: [id])
+  // オプショナルなリレーションの Prisma 既定は SetNull。明示しないと、契約に変換済みの
+  // 見積を削除したときに sourceQuoteId が黙って NULL になり継承元を失う。
+  sourceQuote  Quote?         @relation(fields: [sourceQuoteId], references: [id], onDelete: Restrict)
   items        ContractItem[]
-  invoices     Invoice[]       // 1契約:N請求書(分割請求対応)
+  invoices     Invoice[]      // 1契約:N請求書(分割請求対応)
 
   @@unique([organizationId, number])
   @@index([projectId])
+  @@index([sourceQuoteId])
 }
 
 model ContractItem {
-  id              String  @id @default(cuid())
-  contractId      String
-  sourceQuoteItemId String? // 継承元の見積明細(あれば)
-  name            String
-  description     String?
-  quantity        Int     @default(1)
-  unitPrice       Int
-  amount          Int
-  sortOrder       Int     @default(0)
+  id                String  @id @default(cuid())
+  contractId        String
+  sourceQuoteItemId String? // 継承元の見積明細(追跡用)
+  name              String
+  description       String?
+  quantity          Int     @default(1)
+  unitPrice         Int
+  taxRate           Int     @default(10)
+  amount            Int     @default(0) // トリガー算出
+  sortOrder         Int     @default(0)
 
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
 }
 
 // ─────────────────────────────
 // 請求書(1契約:N請求書 / 分割請求対応)
 // ─────────────────────────────
+// OVERDUE は dueDate から導出できる派生状態のため enum に持たない
+// (表示時に status = SENT かつ dueDate < 今日 で判定する)
 
 enum InvoiceStatus {
   DRAFT
   SENT
   PAID
-  OVERDUE
   CANCELLED
 }
 
 model Invoice {
   id             String        @id @default(cuid())
   organizationId String
+  projectId      String        // C1/C2 の集計を単純化するため契約経由でなく直接持つ
   contractId     String
   number         String
   sequenceNo     Int           @default(1) // この契約に対して何回目の請求か
   status         InvoiceStatus @default(DRAFT)
   issueDate      DateTime?
   dueDate        DateTime?
-  amount         Int           @default(0)
   notes          String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
+  // トリガー算出
+  subtotal10  Int @default(0)
+  tax10       Int @default(0)
+  subtotal8   Int @default(0)
+  tax8        Int @default(0)
+  subtotal    Int @default(0)
+  taxAmount   Int @default(0)
+  totalAmount Int @default(0)
+
+  // 源泉徴収。対象取引かどうかは請求書ごとに選ぶ(既定は対象外)
+  withholdingApplied Boolean @default(false)
+  withholdingTax     Int     @default(0) // トリガー算出
+  paymentAmount      Int     @default(0) // トリガー算出(totalAmount - withholdingTax = 差引請求額)
+
   organization Organization  @relation(fields: [organizationId], references: [id])
+  project      Project       @relation(fields: [projectId], references: [id])
   contract     Contract      @relation(fields: [contractId], references: [id])
   items        InvoiceItem[]
 
   @@unique([organizationId, number])
   @@unique([contractId, sequenceNo])
   @@index([contractId])
+  @@index([projectId])
 
-  // 要アプリ層バリデーション:
-  // 同一contractId内のInvoice(CANCELLED除く).amountの合計は
-  // contract.totalAmountを超えてはならない
+  // DBトリガーで強制する不変条件(docs/db-constraints.sql):
+  // 同一contractId内のInvoice(CANCELLED除く).subtotal の合計は
+  // contract.subtotal を超えてはならない(税抜で比較する)
 }
 
 model InvoiceItem {
-  id        String  @id @default(cuid())
-  invoiceId String
-  name      String
+  id          String  @id @default(cuid())
+  invoiceId   String
+  name        String
   description String?
-  quantity  Int     @default(1)
-  unitPrice Int
-  amount    Int
-  sortOrder Int     @default(0)
+  quantity    Int     @default(1)
+  unitPrice   Int
+  taxRate     Int     @default(10)
+  amount      Int     @default(0) // トリガー算出
+  sortOrder   Int     @default(0)
 
   invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
 }
 
 // ─────────────────────────────
