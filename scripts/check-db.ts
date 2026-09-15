@@ -13,7 +13,9 @@ if (!connectionString) throw new Error('DATABASE_URL が未設定です')
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) })
 
 async function main() {
-  const [{ version }] = await db.$queryRaw<{ version: string }[]>`SELECT version()`
+  const rows = await db.$queryRaw<{ version: string }[]>`SELECT version()`
+  const version = rows[0]?.version
+  if (!version) throw new Error('データベースに接続できませんでした')
   console.log('接続先:', version.split(',')[0])
 
   const applied = await db.$queryRaw<{ migration_name: string }[]>`
