@@ -10,6 +10,10 @@
 // - 金額は円単位の Int。税抜入力を基本とし、消費税は税率(10% / 8%)ごとに集計する
 // - Phase 1 (計画書/覚書/受注表/タスク管理表/領収書) はコメントアウトで骨格のみ記載
 //
+// updatedAt には @updatedAt に加えて @default(now()) を付けてある。@updatedAt だけだと
+// DB側は NOT NULL かつデフォルトなしになり、Prisma Client を経由しない書き込み
+// (生SQL・シード・再計算トリガー)がすべて失敗するため。
+//
 // 【重要】以下のカラムはアプリから書き込まない(DBトリガーが算出する)
 //   *Item.amount
 //   Quote/Contract/Invoice の subtotal10, tax10, subtotal8, tax8,
@@ -17,13 +21,16 @@
 //   Invoice.withholdingTax, Invoice.paymentAmount
 // トリガー定義とテナント整合性チェックは docs/db-constraints.sql を参照。
 
+// Prisma 7 以降、接続URLはスキーマではなく prisma.config.ts に置き、
+// PrismaClient にはドライバアダプタ(@prisma/adapter-pg)を渡す。
+// 生成物の出力先は src/generated/prisma(.gitignore 済み)。
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ─────────────────────────────
@@ -40,7 +47,7 @@ model Organization {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
 
   // 帳票(PDF)に印字する自社情報
   postalCode  String?
@@ -222,7 +229,7 @@ model Customer {
   // この顧客への請求で源泉徴収を既定でONにするか(請求書ごとに上書き可能)
   withholdingDefault Boolean @default(false)
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime @updatedAt @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   projects     Project[]
@@ -247,7 +254,7 @@ model Project {
   name           String
   status         ProjectStatus @default(LEAD)
   createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  updatedAt      DateTime      @updatedAt @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
   customer     Customer     @relation(fields: [customerId], references: [id])
@@ -282,7 +289,7 @@ model Quote {
   expiryDate     DateTime?
   notes          String?
   createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  updatedAt      DateTime    @updatedAt @default(now())
 
   // 以下はすべてトリガー算出。アプリから書き込まないこと
   subtotal10  Int @default(0) // 10%対象の税抜合計
@@ -340,7 +347,7 @@ model Contract {
   contractDate   DateTime?
   notes          String?
   createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  updatedAt      DateTime       @updatedAt @default(now())
 
   // トリガー算出
   subtotal10  Int @default(0)
@@ -407,7 +414,7 @@ model Invoice {
   dueDate        DateTime?
   notes          String?
   createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  updatedAt      DateTime      @updatedAt @default(now())
 
   // トリガー算出
   subtotal10  Int @default(0)

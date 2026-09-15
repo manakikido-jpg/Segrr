@@ -11,6 +11,9 @@
 -- 期待結果: ✓ PASS が39件、✗ FAIL が0件。
 -- 空のDBに対して実行すること(テストデータを固定IDで投入するため)。
 
+-- 最初のエラーで止める。これがないと土台のINSERTが失敗した後も走り続け、
+-- 1件の原因が数十件の FAIL に見えてしまう。
+\set ON_ERROR_STOP on
 SET client_min_messages TO NOTICE;
 
 CREATE OR REPLACE FUNCTION t_fail(label TEXT, stmt TEXT) RETURNS VOID AS $$
