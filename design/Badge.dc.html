@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI','Noto Sans JP',sans-serif;font-size:12px;font-weight:500;line-height:16px;white-space:nowrap;border:1px solid {{ bd }};background:{{ bg }};color:{{ fg }}"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:{{ dot }}"></span>{{ label }}</span>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:150,&quot;height&quot;:40},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;送付済&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;tone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;draft&quot;,&quot;sent&quot;,&quot;ok&quot;,&quot;danger&quot;,&quot;warn&quot;,&quot;neutral&quot;],&quot;default&quot;:&quot;sent&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;outline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;dark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const dark = !!this.props.dark;
+    const L = {
+      draft:  ['#f3f4f6', '#374151', '#9ca3af'],
+      sent:   ['#eff6ff', '#1d4ed8', '#2563eb'],
+      ok:     ['#ecfdf5', '#047857', '#10b981'],
+      danger: ['#fef2f2', '#b91c1c', '#ef4444'],
+      warn:   ['#fffbeb', '#b45309', '#f59e0b'],
+      neutral:['#f9fafb', '#4b5563', '#9ca3af']
+    };
+    const D = {
+      draft:  ['#262626', '#d4d4d4', '#737373'],
+      sent:   ['#1e3a8a', '#bfdbfe', '#60a5fa'],
+      ok:     ['#064e3b', '#a7f3d0', '#34d399'],
+      danger: ['#7f1d1d', '#fecaca', '#f87171'],
+      warn:   ['#78350f', '#fde68a', '#fbbf24'],
+      neutral:['#262626', '#a3a3a3', '#737373']
+    };
+    const tone = this.props.tone || 'draft';
+    const set = (dark ? D : L)[tone] || (dark ? D : L).draft;
+    return {
+      label: this.props.label ?? 'ラベル',
+      bg: this.props.outline ? 'transparent' : set[0],
+      fg: set[1],
+      dot: set[2],
+      bd: this.props.outline ? (dark ? '#525252' : '#d1d5db') : 'transparent'
+    };
+  }
+}
+</script>
+</body>
+</html>

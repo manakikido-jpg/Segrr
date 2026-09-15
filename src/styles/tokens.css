@@ -1,0 +1,207 @@
+/* Segrr デザイントークン
+ *
+ * 出典: design/segrr-ui.dc.html のアートボード13「デザイントークン」
+ * 仕様の解説は docs/design-spec.md を参照。
+ *
+ * 色は「ライトを :root に定義し、ダークは同じ変数名を上書きする」構成。
+ * OSの設定に追従しつつ、[data-theme] による明示切り替えが常に勝つようにしてある。
+ * どの色も :root に定義があるので、メディアクエリ内だけで定義された色は存在しない。
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ── 面と枠 ─────────────────────── */
+  --color-bg:            #f9fafb;
+  --color-surface:       #ffffff;
+  --color-muted:         #f1f2f4;
+  --color-sidebar-bg:    #f9fafb;
+  --color-divider:       #d1d5db;
+  --color-border:        #d1d5db;
+
+  /* ── 文字 ───────────────────────── */
+  --color-text:          #1f2937;
+  --color-text-muted:    #4b5563;
+  --color-text-subtle:   #4b5563;
+
+  /* ── アクセント ─────────────────── */
+  --color-accent:        #1d4ed8;
+  --color-accent-hover:  #1d4ed8;
+
+  /* ── 系列色(内訳グラフ・進捗・タイムラインで共通) ── */
+  --color-series-1:      #2563eb;
+  --color-series-2:      #8b5cf6;
+  --color-series-3:      #10b981;
+  --color-series-4:      #38bdf8;
+  --color-series-5:      #e5e7eb;
+
+  /* ── ステータス(面 -bg + 文字 -fg の2値セット) ──
+   * 日付から算出する状態(期限切れ・残日数)は面を使わず枠線のみで区別する。 */
+  --color-status-draft-bg:    #f1f2f4;
+  --color-status-draft-fg:    #4b5563;
+  --color-status-sent-bg:     #eff6ff;
+  --color-status-sent-fg:     #1d4ed8;
+  --color-status-ok-bg:       #ecfdf5;
+  --color-status-ok-fg:       #047857;
+  --color-status-danger-bg:   #fef2f2;
+  --color-status-danger-fg:   #b91c1c;
+  --color-status-neutral-bg:  #f1f2f4;
+  --color-status-neutral-fg:  #4b5563;
+  --color-status-warn-bg:     #fffbeb;
+  --color-status-warn-fg:     #b45309;
+
+  /* ── タイポグラフィ ─────────────── */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --text-2xs:            11px;  /* uppercase見出し */
+  --text-2xs-lh:         16px;
+  --text-2xs-ls:         .06em;
+  --text-xs:             12px;
+  --text-xs-lh:          16px;
+  --text-sm:             13px;
+  --text-sm-lh:          18px;
+  --text-base:           14px;
+  --text-base-lh:        20px;
+  --text-lg:             15px;
+  --text-lg-lh:          22px;
+  --text-xl:             18px;
+  --text-xl-lh:          26px;
+  --text-xl-ls:          -.01em;
+  --text-2xl:            24px;
+  --text-2xl-lh:         30px;
+  --text-2xl-ls:         -.02em;
+  --text-3xl:            30px;
+  --text-3xl-lh:         38px;
+  --text-3xl-ls:         -.02em;
+  --text-hero:           40px;  /* 主要金額 */
+  --text-hero-lh:        48px;
+  --text-hero-ls:        -.02em;
+
+  /* ── 余白 ───────────────────────── */
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  12px;
+  --space-6:  16px;
+  --space-7:  20px;
+  --space-8:  24px;
+
+  /* ── 角丸 ───────────────────────── */
+  --radius-control: 8px;   /* ボタン・入力 */
+  --radius-card:    12px;
+  --radius-window:  12px;
+  --radius-segment: 5px;   /* セグメンテッドコントロールの内側 */
+  --radius-pill:    999px;
+
+  /* ── 影とフォーカス ─────────────── */
+  --shadow-window:       0 8px 24px rgb(0 0 0 / .06);
+  --shadow-dialog:       0 12px 32px rgb(0 0 0 / .16);
+  --shadow-notification: 0 10px 26px rgb(0 0 0 / .14);
+  --focus-ring:          0 0 0 3px rgb(0 122 255 / .25);
+
+  /* ── 寸法 ───────────────────────── */
+  --control-h:    38px;
+  --input-h:      42px;
+  --row-h:        48px;
+  --row-h-header: 40px;
+  --sidebar-w:    260px;
+  --header-h:     64px;
+}
+
+/* スマホではタップ領域を44px以上にする */
+@media (max-width: 640px) {
+  :root {
+    --control-h: 44px;
+    --input-h:   44px;
+  }
+}
+
+/* ダーク: OSの設定に追従(明示的にライトを選んでいる場合を除く) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-bg:            #171717;
+    --color-surface:       #262626;
+    --color-muted:         #404040;
+    --color-sidebar-bg:    #262626;
+    --color-divider:       #404040;
+    --color-border:        #525252;
+
+    --color-text:          #f9fafb;
+    --color-text-muted:    #a3a3a3;
+    --color-text-subtle:   #737373;
+
+    --color-accent:        #3b82f6;
+    --color-accent-hover:  #60a5fa;
+
+    --color-series-1:      #60a5fa;
+    --color-series-2:      #a78bfa;
+    --color-series-3:      #34d399;
+    --color-series-4:      #7dd3fc;
+    --color-series-5:      #404040;
+
+    --color-status-draft-bg:    #404040;
+    --color-status-draft-fg:    #a3a3a3;
+    --color-status-sent-bg:     #1d4ed8;
+    --color-status-sent-fg:     #eff6ff;
+    --color-status-ok-bg:       #047857;
+    --color-status-ok-fg:       #34d399;
+    --color-status-danger-bg:   #b91c1c;
+    --color-status-danger-fg:   #fef2f2;
+    --color-status-neutral-bg:  #404040;
+    --color-status-neutral-fg:  #c4c7c5;
+    --color-status-warn-bg:     #b45309;
+    --color-status-warn-fg:     #fbbf24;
+  }
+}
+
+/* ダーク: 明示的に選択(OSの設定より優先する) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg:            #171717;
+  --color-surface:       #262626;
+  --color-muted:         #404040;
+  --color-sidebar-bg:    #262626;
+  --color-divider:       #404040;
+  --color-border:        #525252;
+
+  --color-text:          #f9fafb;
+  --color-text-muted:    #a3a3a3;
+  --color-text-subtle:   #737373;
+
+  --color-accent:        #3b82f6;
+  --color-accent-hover:  #60a5fa;
+
+  --color-series-1:      #60a5fa;
+  --color-series-2:      #a78bfa;
+  --color-series-3:      #34d399;
+  --color-series-4:      #7dd3fc;
+  --color-series-5:      #404040;
+
+  --color-status-draft-bg:    #404040;
+  --color-status-draft-fg:    #a3a3a3;
+  --color-status-sent-bg:     #1d4ed8;
+  --color-status-sent-fg:     #eff6ff;
+  --color-status-ok-bg:       #047857;
+  --color-status-ok-fg:       #34d399;
+  --color-status-danger-bg:   #b91c1c;
+  --color-status-danger-fg:   #fef2f2;
+  --color-status-neutral-bg:  #404040;
+  --color-status-neutral-fg:  #c4c7c5;
+  --color-status-warn-bg:     #b45309;
+  --color-status-warn-fg:     #fbbf24;
+}
+
+/* 金額の表示規約。
+ * 等幅 + tabular-nums + 右揃え + 3桁区切り(区切りは実装側で toLocaleString する)。
+ * マイナスは先頭に「-」を付け、色は danger。 */
+.amount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.amount--negative { color: var(--color-status-danger-fg); }

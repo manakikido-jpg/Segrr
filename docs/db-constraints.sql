@@ -19,20 +19,23 @@
 -- ─────────────────────────────
 -- Int(INTEGER)の上限は約21.4億。quantity * unitPrice がこれを超えると
 -- 乗算時点でオーバーフロー例外になるため、単価側で手前に線を引いておく。
+-- 単価のマイナスを許すのは値引き行のため(デザイン仕様: 値引きは単価をマイナスで入力し、
+-- 同じ税率の課税対象から差し引く)。ただし税率別の小計がマイナスになると消費税額も
+-- マイナスになって意味をなさないため、小計側をセクション3で検査する。
 
 ALTER TABLE "QuoteItem"
   ADD CONSTRAINT "QuoteItem_quantity_positive"  CHECK ("quantity" > 0),
-  ADD CONSTRAINT "QuoteItem_unitPrice_range"    CHECK ("unitPrice" BETWEEN 0 AND 1000000000),
+  ADD CONSTRAINT "QuoteItem_unitPrice_range"    CHECK ("unitPrice" BETWEEN -1000000000 AND 1000000000),
   ADD CONSTRAINT "QuoteItem_taxRate_allowed"    CHECK ("taxRate" IN (8, 10));
 
 ALTER TABLE "ContractItem"
   ADD CONSTRAINT "ContractItem_quantity_positive" CHECK ("quantity" > 0),
-  ADD CONSTRAINT "ContractItem_unitPrice_range"   CHECK ("unitPrice" BETWEEN 0 AND 1000000000),
+  ADD CONSTRAINT "ContractItem_unitPrice_range"    CHECK ("unitPrice" BETWEEN -1000000000 AND 1000000000),
   ADD CONSTRAINT "ContractItem_taxRate_allowed"   CHECK ("taxRate" IN (8, 10));
 
 ALTER TABLE "InvoiceItem"
   ADD CONSTRAINT "InvoiceItem_quantity_positive" CHECK ("quantity" > 0),
-  ADD CONSTRAINT "InvoiceItem_unitPrice_range"   CHECK ("unitPrice" BETWEEN 0 AND 1000000000),
+  ADD CONSTRAINT "InvoiceItem_unitPrice_range"    CHECK ("unitPrice" BETWEEN -1000000000 AND 1000000000),
   ADD CONSTRAINT "InvoiceItem_taxRate_allowed"   CHECK ("taxRate" IN (8, 10));
 
 ALTER TABLE "Organization"
@@ -123,6 +126,13 @@ BEGIN
     INTO s10, s8
     FROM "QuoteItem" WHERE "quoteId" = target_id;
 
+  -- 値引き行で税率別の小計がマイナスに振り切れていないか検査する
+  IF s10 < 0 OR s8 < 0 THEN
+    RAISE EXCEPTION
+      '値引きが大きすぎます。税率別の小計はマイナスにできません(10%%対象: %円 / 8%%対象: %円)。見積ID: %',
+      s10, s8, target_id;
+  END IF;
+
   t10 := segrr_round(s10 * 0.10, mode);
   t8  := segrr_round(s8  * 0.08, mode);
 
@@ -158,6 +168,13 @@ BEGIN
     INTO s10, s8
     FROM "ContractItem" WHERE "contractId" = target_id;
 
+  -- 値引き行で税率別の小計がマイナスに振り切れていないか検査する
+  IF s10 < 0 OR s8 < 0 THEN
+    RAISE EXCEPTION
+      '値引きが大きすぎます。税率別の小計はマイナスにできません(10%%対象: %円 / 8%%対象: %円)。契約ID: %',
+      s10, s8, target_id;
+  END IF;
+
   t10 := segrr_round(s10 * 0.10, mode);
   t8  := segrr_round(s8  * 0.08, mode);
 
@@ -192,6 +209,12 @@ BEGIN
          COALESCE(SUM("amount") FILTER (WHERE "taxRate" = 8), 0)
     INTO s10, s8
     FROM "InvoiceItem" WHERE "invoiceId" = target_id;
+
+  IF s10 < 0 OR s8 < 0 THEN
+    RAISE EXCEPTION
+      '値引きが大きすぎます。税率別の小計はマイナスにできません(10%%対象: %円 / 8%%対象: %円)。請求ID: %',
+      s10, s8, target_id;
+  END IF;
 
   t10 := segrr_round(s10 * 0.10, mode);
   t8  := segrr_round(s8  * 0.08, mode);

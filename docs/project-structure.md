@@ -5,11 +5,17 @@
 ```
 segrr/
 ├── README.md                      # セットアップ手順・環境変数一覧
+├── design/                        # デザインキャンバス(Claude Design 出力)
+│   ├── segrr-ui.dc.html           # 全14アートボード
+│   ├── Nav.dc.html / Badge.dc.html # 共有パーツ
+│   └── logo.png / support.js / uploads/
 ├── docs/
 │   ├── segrr-requirements-v1.md   # 要件定義書(このリポジトリの正)
 │   ├── project-structure.md       # このファイル
 │   ├── phase0-task-breakdown.md   # タスク分解
 │   ├── PM-instructions-for-claude-code.md # モデル運用・査読の進め方
+│   ├── design-brief.md            # デザイン依頼時のプロンプト
+│   ├── design-spec.md             # デザインの仕様まとめ(Claude Design 出力)
 │   └── db-constraints.sql         # 金額・消費税・テナント整合性のDB制約
 ├── prisma/
 │   ├── schema.prisma
@@ -58,6 +64,8 @@ segrr/
 │   │   │   ├── contract-service.ts
 │   │   │   └── invoice-service.ts   # 分割請求の合計金額チェックはここに集約
 │   │   └── validators/              # zodスキーマ(フォーム入力・API入出力の型検証)
+│   ├── styles/
+│   │   └── tokens.css               # デザイントークン(design/ のアートボード13が出典)
 │   ├── lib/
 │   │   ├── db.ts                    # Prisma Client シングルトン
 │   │   ├── auth.ts                  # NextAuth設定(Googleプロバイダ + 招待制チェック)

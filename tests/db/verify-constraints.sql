@@ -8,7 +8,7 @@
 --   npx prisma migrate deploy   # schema.prisma + db-constraints.sql のマイグレーション
 --   psql -d segrr_test -f tests/db/verify-constraints.sql
 --
--- 期待結果: ✓ PASS が32件、✗ FAIL が0件。
+-- 期待結果: ✓ PASS が39件、✗ FAIL が0件。
 -- 空のDBに対して実行すること(テストデータを固定IDで投入するため)。
 
 SET client_min_messages TO NOTICE;
@@ -133,6 +133,26 @@ DO $$ BEGIN
     (SELECT "withholdingTax" FROM "Invoice" WHERE id='iv3'), 306300);
   PERFORM t_ok('   源泉徴収を対象外に戻す', $q$UPDATE "Invoice" SET "withholdingApplied"=false WHERE id='iv3'$q$);
   PERFORM t_eq('⑧ 対象外なら0', (SELECT "withholdingTax" FROM "Invoice" WHERE id='iv3'), 0);
+END $$;
+
+-- ── 値引き行(単価をマイナスで入力) ──
+-- デザイン仕様: 値引きは専用カラムではなく、単価をマイナスにした明細行で表現し、
+-- 同じ税率の課税対象から差し引く。
+INSERT INTO "Project"(id,"organizationId","customerId",name) VALUES ('prj3','org1','cus1','値引き検証');
+INSERT INTO "Quote"(id,"organizationId","projectId",number) VALUES ('qt3','org1','prj3','EST-0003');
+INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,"unitPrice","taxRate") VALUES
+  ('qd1','qt3','制作費',1,100000,10),
+  ('qd2','qt3','継続割引',1,-10000,10);
+DO $$ BEGIN
+  PERFORM t_eq('⑪ 値引き行の amount', (SELECT amount FROM "QuoteItem" WHERE id='qd2'), -10000);
+  PERFORM t_eq('⑪ 値引き後の税抜小計(100000 - 10000)', (SELECT "subtotal10" FROM "Quote" WHERE id='qt3'), 90000);
+  PERFORM t_eq('⑪ 値引き後の消費税(90000 x 10%)', (SELECT "tax10" FROM "Quote" WHERE id='qt3'), 9000);
+  PERFORM t_eq('⑪ 値引き後の税込合計', (SELECT "totalAmount" FROM "Quote" WHERE id='qt3'), 99000);
+  PERFORM t_fail('⑪ 値引きが大きすぎて小計がマイナス',
+    $q$UPDATE "QuoteItem" SET "unitPrice"=-200000 WHERE id='qd2'$q$);
+  PERFORM t_ok('⑪ 単位(人日)を持つ工数行',
+    $q$INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,unit,"unitPrice") VALUES('qd3','qt3','実装',5,'人日',80000)$q$);
+  PERFORM t_eq('⑪ 工数行の amount (5人日 x 80000)', (SELECT amount FROM "QuoteItem" WHERE id='qd3'), 400000);
 END $$;
 
 -- ── 入力値チェックとカスケード削除 ──

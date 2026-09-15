@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+
+<style>
+body{margin:0;background:#f3f4f6;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI','Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;color:#1f2937}
+a{color:#1d4ed8;text-decoration:none}a:hover{color:#1d4ed8;text-decoration:underline}
+</style>
+</helmet>
+
+<div style="padding:40px 44px 96px;display:flex;flex-direction:column;gap:52px">
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:860px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="logo.png" alt="" style="width:32px;height:32px;object-fit:contain">
+      <span style="font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI','Noto Sans JP',sans-serif;font-size:22px;font-weight:600;letter-spacing:-.01em">Segrr</span>
+      <span style="height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:500">Preline UI / 14 artboards</span>
+    </div>
+    <p style="margin:0;font-size:14px;line-height:22px;color:#4b5563;text-wrap:pretty">個人事業主向け書類管理ツール。Preline UI（Tailwind）のコンポーネント作法で構成。system-ui のサンセリフ、gray-50/100 の面と gray-300（#d1d5db）の枠、blue-600 アクセント（彩度はステータスと警告のみ）、rounded-lg(8px)/rounded-xl(12px)、38px のボタンと42px の入力、64px ページヘッダー＋260px サイドバー、uppercase の text-xs テーブルヘッダー、pill バッジ。金額は等幅・右揃え・桁区切り。PDF帳票（A4）は対象外。</p>
+    <p style="margin:0;font-size:12px;line-height:20px;color:#4b5563">前提（要確認）: 1案件に契約は1通 / 見積は契約変換後ロック、契約は請求発行後ロック（複製で新規作成へ誘導） / 源泉徴収は請求単位、税抜額に10.21%（100万円超の段階計算は未対応）。</p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid #d1d5db">
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;color:#4b5563">GROUP A</span>
+      <span style="font-size:15px;font-weight:600">入口とダッシュボード</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+      <div id="s01" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">01</span>
+          <span style="font-size:14px;font-weight:500">ログイン</span>
+          <span style="font-size:12px;color:#4b5563">Google のみ / 招待外アカウントの拒否</span>
+        </div>
+        <div style="display:flex;gap:16px">
+          <div style="width:520px;height:560px;border-radius:10px;background:#f9fafb;display:flex;align-items:center;justify-content:center;border:1px solid #d1d5db;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+            <div style="width:360px;background:#fff;border-radius:10px;padding:32px 28px;display:flex;flex-direction:column;gap:24px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.10)">
+              <img src="logo.png" alt="" style="width:40px;height:40px;object-fit:contain">
+              <div style="display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+                <span style="font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">ログイン</span>
+                <span style="font-size:14px;line-height:18px;color:#4b5563">見積・契約・請求をひと続きに。<br>招待されたアカウントのみご利用いただけます。</span>
+              </div>
+              <button style="width:100%;height:40px;border:1px solid #d1d5db;border-radius:6px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer" style-hover="background:#f1f2f4">
+                <span style="width:18px;height:18px;border-radius:999px;background:#f1f2f4;flex:none"></span>Google で続ける
+              </button>
+              <span style="font-size:12px;line-height:18px;color:#4b5563;text-align:center">続行すると<a href="#s01">利用規約</a>と<a href="#s01">プライバシーポリシー</a>に同意したものとみなされます</span>
+            </div>
+          </div>
+          <div style="width:520px;height:560px;border-radius:10px;background:#f9fafb;display:flex;align-items:center;justify-content:center;position:relative;border:1px solid #d1d5db;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+            <span style="position:absolute;top:14px;left:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#b91c1c">state: access-denied</span>
+            <div style="width:360px;background:#fff;border-radius:10px;padding:32px 28px;display:flex;flex-direction:column;gap:20px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.10)">
+              <img src="logo.png" alt="" style="width:40px;height:40px;object-fit:contain">
+              <div style="width:100%;display:flex;gap:12px;padding:16px;border-radius:5px;background:#fef2f2">
+                <span style="width:18px;height:18px;border-radius:999px;background:#dc2626;flex:none;margin-top:1px"></span>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <span style="font-size:14px;font-weight:500;color:#b91c1c">このアカウントではログインできません</span>
+                  <span style="font-size:12px;line-height:18px;color:#b91c1c">ryo.tanaka@gmail.com は招待されていません。招待メールを受け取ったアドレスでログインしてください。</span>
+                </div>
+              </div>
+              <button style="width:100%;height:40px;border:none;border-radius:6px;background:#1d4ed8;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">別のアカウントでログイン</button>
+              <span style="font-size:12px;color:#4b5563">お困りの場合は <a href="#s01">support@segrr.jp</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s02" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">02</span>
+          <span style="font-size:14px;font-weight:500">ダッシュボード</span>
+          <span style="font-size:12px;color:#4b5563">検索トップバー + サイドバー + カード</span>
+        </div>
+        <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+          <dc-import name="Nav" active="dashboard" hint-size="260px,720px"></dc-import>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#fff">
+            <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+              <div style="width:340px;height:38px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 12px">
+                <span style="width:14px;height:14px;border-radius:999px;border:2px solid #9ca3af;flex:none"></span>
+                <span style="flex:1;font-size:14px;color:#6b7280">顧客・案件・書類を検索</span>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#4b5563;background:#f3f4f6;border:1px solid #d1d5db;border-radius:5px;padding:1px 5px">⌘ K</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="width:38px;height:38px;border-radius:8px;border:1px solid #d1d5db;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:#4b5563">?</span>
+                <span style="position:relative;width:38px;height:38px;border-radius:8px;border:1px solid #d1d5db;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:#4b5563">△<span style="position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#dc2626;color:#fff;font-size:10px;font-weight:600;display:inline-flex;align-items:center;justify-content:center">2</span></span>
+                <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#1d4ed8">見積書を作成</button>
+                <span style="width:34px;height:34px;border-radius:999px;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">田</span>
+              </div>
+            </div>
+            <div style="flex:1;padding:8px 24px 28px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:stretch">
+                <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:6px;justify-content:center">
+                  <span style="font-size:12px;font-weight:500;line-height:16px;color:#1d4ed8">今月の請求額（税込）</span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:40px;line-height:48px;font-weight:600;letter-spacing:-.02em;color:#2563eb">¥1,342,000</span>
+                  <span style="font-size:14px;line-height:18px;color:#4b5563">入金済 ¥742,000 ・ 先月 ¥980,000</span>
+                </div>
+                <div style="background:#f9fafb;border-radius:8px;padding:4px 20px;display:flex;flex-direction:column;justify-content:center">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #d1d5db">
+                    <span style="font-size:14px;color:#4b5563">未入金</span>
+                    <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:12px;color:#b91c1c">期限切れ 1件 ¥220,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:22px">¥600,000</span></div>
+                  </div>
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #d1d5db">
+                    <span style="font-size:14px;color:#4b5563">承認待ちの見積</span>
+                    <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:12px;color:#4b5563">¥2,180,000 相当</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:22px">4<span style="font-size:14px;color:#4b5563"> 件</span></span></div>
+                  </div>
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:14px 0">
+                    <span style="font-size:14px;color:#4b5563">進行中の案件</span>
+                    <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:12px;color:#4b5563">今週更新 3件</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:22px">8<span style="font-size:14px;color:#4b5563"> 件</span></span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+                <div style="background:#f9fafb;border-radius:8px;overflow:hidden">
+                  <div style="height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px">
+                    <span style="font-size:15px;font-weight:600">期限が近い書類</span>
+                    <a href="#s11" style="font-size:13px;font-weight:500">すべて見る</a>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #d1d5db">
+                    <dc-import name="Badge" label="期限切れ" tone="danger" hint-size="86px,24px"></dc-import>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                      <span style="font-size:14px;line-height:18px">請求書 INV-0142 ・ 株式会社ミナト製作所</span>
+                      <span style="font-size:12px;line-height:16px;color:#b91c1c">支払期限 2026-08-31（3日超過）</span>
+                    </div>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px">¥220,000</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #d1d5db">
+                    <dc-import name="Badge" label="あと2日" tone="warn" hint-size="76px,24px"></dc-import>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                      <span style="font-size:14px;line-height:18px">見積書 EST-0091 ・ 合同会社アオイ</span>
+                      <span style="font-size:12px;line-height:16px;color:#4b5563">有効期限 2026-09-05</span>
+                    </div>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px">¥480,000</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #d1d5db">
+                    <dc-import name="Badge" label="あと6日" tone="neutral" hint-size="76px,24px"></dc-import>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                      <span style="font-size:14px;line-height:18px">請求書 INV-0147 ・ 株式会社ソラモト</span>
+                      <span style="font-size:12px;line-height:16px;color:#4b5563">支払期限 2026-09-09</span>
+                    </div>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px">¥330,000</span>
+                  </div>
+                </div>
+                <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;overflow:hidden">
+                  <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px">
+                    <span style="font-size:15px;font-weight:600">書類の内訳</span>
+                    <span style="font-size:12px;color:#4b5563">37件 / ¥6,362,000</span>
+                  </div>
+                  <div style="padding:0 20px 14px;display:flex;gap:3px;height:10px">
+                    <div style="width:32%;background:#2563eb;border-radius:3px"></div>
+                    <div style="width:22%;background:#8b5cf6;border-radius:3px"></div>
+                    <div style="width:27%;background:#10b981;border-radius:3px"></div>
+                    <div style="width:11%;background:#38bdf8;border-radius:3px"></div>
+                    <div style="width:8%;background:#e5e7eb;border-radius:3px"></div>
+                  </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;border-top:1px solid #f1f2f4">
+                      <span style="width:10px;height:10px;border-radius:3px;flex:none;background:#2563eb"></span>
+                      <span style="flex:1;min-width:0;font-size:14px;color:#1f2937">送付済（回収待ち）</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563">¥2,180,000</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:32px;text-align:right">11</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;border-top:1px solid #f1f2f4">
+                      <span style="width:10px;height:10px;border-radius:3px;flex:none;background:#8b5cf6"></span>
+                      <span style="flex:1;min-width:0;font-size:14px;color:#1f2937">承認・締結済</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563">¥1,480,000</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:32px;text-align:right">8</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;border-top:1px solid #f1f2f4">
+                      <span style="width:10px;height:10px;border-radius:3px;flex:none;background:#10b981"></span>
+                      <span style="flex:1;min-width:0;font-size:14px;color:#1f2937">入金済</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563">¥2,320,000</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:32px;text-align:right">10</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;border-top:1px solid #f1f2f4">
+                      <span style="width:10px;height:10px;border-radius:3px;flex:none;background:#38bdf8"></span>
+                      <span style="flex:1;min-width:0;font-size:14px;color:#1f2937">下書き</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563">¥382,000</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:32px;text-align:right">6</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;border-top:1px solid #f1f2f4">
+                      <span style="width:10px;height:10px;border-radius:3px;flex:none;background:#e5e7eb"></span>
+                      <span style="flex:1;min-width:0;font-size:14px;color:#1f2937">却下・キャンセル</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563">¥120,000</span>
+                      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:32px;text-align:right">2</span>
+                    </div>
+                  <div style="padding:16px 20px;border-top:1px solid #d1d5db;display:flex;flex-direction:column;gap:10px">
+                    <span style="font-size:12px;font-weight:500;color:#4b5563">最近の動き</span>
+                    <span style="font-size:14px;color:#4b5563">09-02 ・ 契約 CTR-0031 を締結済にしました</span>
+                    <span style="font-size:14px;color:#4b5563">09-01 ・ 請求 INV-0147 を送付しました</span>
+                    <span style="font-size:14px;color:#4b5563">08-29 ・ 見積 EST-0093 が承認されました</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s02d" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">02-dark</span>
+          <span style="font-size:14px;font-weight:500">ダッシュボード（ダークテーマ）</span>
+        </div>
+        <div style="width:900px;border-radius:10px;overflow:hidden;display:flex;background:#171717;border:1px solid #404040;box-shadow:0 8px 24px rgba(0,0,0,.10)">
+          <dc-import name="Nav" active="dashboard" dark="{{ true }}" hint-size="260px,480px"></dc-import>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#171717;border-bottom:1px solid #404040">
+              <span style="font-size:18px;font-weight:600;letter-spacing:-.01em;color:#f5f5f5">ダッシュボード</span>
+              <button style="height:32px;padding:0 14px;border:none;border-radius:6px;background:#3b82f6;color:#ffffff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">見積書を作成</button>
+            </div>
+            <div style="flex:1;padding:8px 24px 24px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+                <div style="background:#262626;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#d1d5db">今月の請求額</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:24px;color:#f9fafb">¥1,342,000</span><span style="font-size:12px;color:#d1d5db">入金済 ¥742,000</span></div>
+                <div style="background:#262626;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#d1d5db">未入金</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:24px;color:#f9fafb">¥600,000</span><span style="font-size:12px;color:#fca5a5">期限切れ 1件 ¥220,000</span></div>
+                <div style="background:#262626;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#d1d5db">承認待ちの見積</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:24px;color:#f9fafb">4 <span style="font-size:14px;color:#d1d5db">件</span></span><span style="font-size:12px;color:#d1d5db">¥2,180,000 相当</span></div>
+              </div>
+              <div style="background:#262626;border-radius:8px;overflow:hidden">
+                <div style="height:40px;display:flex;align-items:center;padding:0 20px;font-size:15px;font-weight:600;color:#f9fafb">期限が近い書類</div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #404040">
+                  <dc-import name="Badge" label="期限切れ" tone="danger" dark="{{ true }}" hint-size="86px,24px"></dc-import>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;color:#f9fafb">請求書 INV-0142 ・ 株式会社ミナト製作所</span><span style="font-size:12px;color:#fca5a5">支払期限 2026-08-31（3日超過）</span></div>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px;color:#f9fafb">¥220,000</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #404040">
+                  <dc-import name="Badge" label="あと2日" tone="warn" dark="{{ true }}" hint-size="76px,24px"></dc-import>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;color:#f9fafb">見積書 EST-0091 ・ 合同会社アオイ</span><span style="font-size:12px;color:#d1d5db">有効期限 2026-09-05</span></div>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px;color:#f9fafb">¥480,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div style="padding:0 44px 52px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid #d1d5db">
+    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;color:#4b5563">GROUP B</span>
+    <span style="font-size:15px;font-weight:600">顧客と案件</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+    <div id="s03" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">03</span>
+        <span style="font-size:14px;font-weight:500">顧客一覧</span>
+        <span style="font-size:12px;color:#4b5563">検索入力 + 表（行48px / ヘッダ40px uppercase）</span>
+      </div>
+      <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <dc-import name="Nav" active="clients" hint-size="260px,640px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+            <div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:18px;font-weight:600;letter-spacing:-.01em;color:#1f2937">顧客</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">24</span></div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="width:280px;height:40px;border-radius:6px;background:#f1f2f4;display:flex;align-items:center;gap:10px;padding:0 16px"><span style="width:16px;height:16px;border-radius:999px;border:2px solid #86868b;flex:none"></span><span style="font-size:14px;color:#4b5563">顧客名・担当者で検索</span></div>
+              <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">最終更新順</button>
+              <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">顧客を追加</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.3fr) 72px 132px 104px;height:40px;align-items:center;padding:0 24px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4b5563;background:#f3f4f6;border-bottom:1px solid #d1d5db">
+            <span>顧客名</span><span>担当者</span><span>登録番号（インボイス）</span><span style="text-align:right">案件</span><span style="text-align:right">未入金</span><span style="text-align:right">最終更新</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.3fr) 72px 132px 104px;height:48px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db" style-hover="background:#f9fafb">
+            <a href="#s04" style="font-weight:500">株式会社ミナト製作所</a><span style="color:#4b5563">山田 拓也</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">T1010001012345</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">3</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right;color:#b91c1c">¥550,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">09-02</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.3fr) 72px 132px 104px;height:48px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db">
+            <span style="font-weight:500">合同会社アオイ</span><span style="color:#4b5563">佐藤 めぐみ</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">T5010001098765</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">2</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right;color:#4b5563">¥0</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">08-29</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.3fr) 72px 132px 104px;height:48px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db">
+            <span style="font-weight:500">ナカムラデザイン事務所</span><span style="color:#4b5563">中村 慧</span><span style="font-size:14px;color:#4b5563">未登録</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">1</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right;color:#4b5563">¥0</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">08-21</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.3fr) 72px 132px 104px;height:48px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db">
+            <span style="font-weight:500">株式会社ソラモト</span><span style="color:#4b5563">小林 直</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">T3010001055512</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">2</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right;color:#b91c1c">¥330,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">08-18</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.3fr) 72px 132px 104px;height:48px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db">
+            <span style="font-weight:500">有限会社ハシモト工房</span><span style="color:#4b5563">橋本 篤</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">T9010001077231</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563">0</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right;color:#4b5563">¥0</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">07-30</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 24px;font-size:12px;color:#4b5563">
+            <span>1–5 / 24 件</span>
+            <div style="display:flex;gap:8px"><button style="height:32px;padding:0 12px;border:none;border-radius:6px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#4b5563">前へ</button><button style="height:38px;padding:0 12px;border:none;border-radius:8px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8;cursor:pointer">次へ</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s04" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">04</span>
+        <span style="font-size:14px;font-weight:500">顧客詳細</span>
+        <span style="font-size:12px;color:#4b5563">タブ + グループ化パネル</span>
+      </div>
+      <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <dc-import name="Nav" active="clients" hint-size="260px,700px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="flex:none;padding:16px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+              <span style="font-size:12px;color:#4b5563"><a href="#s03">顧客</a> ／ 株式会社ミナト製作所</span>
+              <span style="font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">株式会社ミナト製作所</span>
+              <span style="font-size:14px;color:#4b5563">〒140-0002 東京都品川区東品川2-1-1 ・ 山田 拓也 様 ・ takuya.yamada@minato-mfg.co.jp</span>
+            </div>
+            <div style="display:flex;gap:8px;flex:none">
+              <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">編集</button>
+              <button style="height:32px;padding:0 14px;border:none;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">案件を作成</button>
+            </div>
+          </div>
+          <div style="flex:none;display:flex;gap:0;padding:0 24px;border-bottom:1px solid #d1d5db">
+            <span style="height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:3px solid #1d4ed8;font-size:14px;font-weight:500;color:#1d4ed8">案件 3</span>
+            <span style="height:48px;display:flex;align-items:center;padding:0 16px;font-size:14px;font-weight:500;color:#4b5563">書類 11</span>
+            <span style="height:48px;display:flex;align-items:center;padding:0 16px;font-size:14px;font-weight:500;color:#4b5563">メモ</span>
+          </div>
+          <div style="flex:1;padding:20px 24px 28px;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+              <div style="background:#f9fafb;border-radius:8px;overflow:hidden">
+                <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 112px 132px 132px 88px;height:28px;align-items:center;padding:0 20px;font-size:12px;font-weight:500;color:#4b5563;border-bottom:1px solid #d1d5db">
+                  <span>案件</span><span>状態</span><span style="text-align:right">契約金額</span><span style="text-align:right">残額</span><span style="text-align:right">更新</span>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 112px 132px 132px 88px;height:56px;align-items:center;padding:0 20px;font-size:14px;border-bottom:1px solid #d1d5db">
+                  <a href="#s06" style="font-weight:500">コーポレートサイト リニューアル</a><dc-import name="Badge" label="進行中" tone="sent" hint-size="72px,24px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥1,000,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right;color:#b91c1c">¥400,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">09-02</span>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 112px 132px 132px 88px;height:56px;align-items:center;padding:0 20px;font-size:14px;border-bottom:1px solid #d1d5db">
+                  <span style="font-weight:500">採用パンフレット 制作</span><dc-import name="Badge" label="完了" tone="ok" hint-size="64px,24px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥480,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right;color:#4b5563">¥0</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">06-14</span>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 112px 132px 132px 88px;height:56px;align-items:center;padding:0 20px;font-size:14px">
+                  <span style="font-weight:500">保守運用 2026年度</span><dc-import name="Badge" label="下書き" tone="draft" hint-size="72px,24px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563">—</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563">—</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:14px">08-30</span>
+                </div>
+              </div>
+              <div style="background:#f9fafb;border-radius:8px;overflow:hidden">
+                <div style="height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px"><span style="font-size:15px;font-weight:600">最近の書類</span><a href="#s11" style="font-size:14px;font-weight:500">書類一覧へ</a></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #d1d5db;font-size:14px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#4b5563;width:88px;font-size:14px">INV-0147</span><span style="flex:1;min-width:0">請求書（第2回）</span><dc-import name="Badge" label="送付済" tone="sent" hint-size="72px,24px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;width:104px;text-align:right">¥330,000</span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #d1d5db;font-size:14px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#4b5563;width:88px;font-size:14px">INV-0142</span><span style="flex:1;min-width:0">請求書（第1回）</span><dc-import name="Badge" label="期限切れ" tone="danger" hint-size="86px,24px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;width:104px;text-align:right">¥220,000</span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid #d1d5db;font-size:14px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#4b5563;width:88px;font-size:14px">CTR-0031</span><span style="flex:1;min-width:0">業務委託契約書</span><dc-import name="Badge" label="締結済" tone="ok" hint-size="72px,24px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;width:104px;text-align:right">¥1,000,000</span></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="background:#f9fafb;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:12px">
+                <span style="font-size:15px;font-weight:600">取引サマリ</span>
+                <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>累計取引額</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥2,480,000</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>未入金</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#b91c1c">¥550,000</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>平均入金日数</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#1f2937">38日</span></div>
+              </div>
+              <div style="background:#f9fafb;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:12px">
+                <span style="font-size:15px;font-weight:600">請求条件</span>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#4b5563"><span>締日 / 支払</span><span style="color:#1f2937">月末締 翌月末払</span></div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#4b5563"><span>源泉徴収</span><span style="color:#1f2937">あり（既定ON）</span></div>
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#4b5563"><span>登録番号</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#1f2937">T1010001012345</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s05" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">05</span>
+        <span style="font-size:14px;font-weight:500">案件一覧</span>
+        <span style="font-size:12px;color:#4b5563">絞り込みピル + 進捗ステップ</span>
+      </div>
+      <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <dc-import name="Nav" active="projects" hint-size="260px,580px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+            <div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:18px;font-weight:600;letter-spacing:-.01em;color:#1f2937">案件</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">8</span></div>
+            <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">案件を作成</button>
+          </div>
+          <div style="flex:none;display:flex;gap:8px;padding:0 24px 12px">
+            <span style="height:32px;padding:0 16px;display:inline-flex;align-items:center;border-radius:5px;background:#eff6ff;color:#1d4ed8;font-size:14px;font-weight:500">進行中</span>
+            <span style="height:32px;padding:0 16px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid #d1d5db;color:#4b5563;font-size:14px">完了</span>
+            <span style="height:32px;padding:0 16px;display:inline-flex;align-items:center;border-radius:8px;border:1px solid #d1d5db;color:#4b5563;font-size:14px">すべて</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 208px 124px 124px 124px;height:28px;align-items:center;padding:0 24px;font-size:12px;font-weight:500;color:#4b5563;border-bottom:1px solid #d1d5db">
+            <span>案件</span><span>顧客</span><span>進捗</span><span style="text-align:right">契約金額</span><span style="text-align:right">請求済</span><span style="text-align:right">残額</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 208px 124px 124px 124px;height:52px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db">
+            <a href="#s06" style="font-weight:500">コーポレートサイト リニューアル</a><span style="color:#4b5563">株式会社ミナト製作所</span>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px"><span style="padding:3px 8px;border-radius:5px;background:#f0f9ff;color:#0369a1">見積</span><span style="color:#4b5563">›</span><span style="padding:3px 8px;border-radius:5px;background:#f5f3ff;color:#6d28d9">契約</span><span style="color:#4b5563">›</span><span style="padding:3px 8px;border-radius:5px;background:#eff6ff;color:#1d4ed8">請求2/3</span></div>
+            <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥1,000,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥600,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right;color:#b91c1c">¥400,000</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 208px 124px 124px 124px;height:52px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db">
+            <span style="font-weight:500">ブランドロゴ 一式</span><span style="color:#4b5563">合同会社アオイ</span>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px"><span style="padding:3px 8px;border-radius:5px;background:#f0f9ff;color:#0369a1">見積送付済</span><span style="color:#4b5563">›</span><span style="padding:3px 8px;border-radius:5px;background:#f1f2f4;color:#4b5563">契約 未</span></div>
+            <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563">—</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563">—</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563">—</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 208px 124px 124px 124px;height:52px;align-items:center;padding:0 24px;font-size:14px;border-bottom:1px solid #d1d5db">
+            <span style="font-weight:500">LP 制作（秋キャンペーン）</span><span style="color:#4b5563">株式会社ソラモト</span>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px"><span style="padding:3px 8px;border-radius:5px;background:#f0f9ff;color:#0369a1">見積</span><span style="color:#4b5563">›</span><span style="padding:3px 8px;border-radius:5px;background:#f5f3ff;color:#6d28d9">契約</span><span style="color:#4b5563">›</span><span style="padding:3px 8px;border-radius:5px;background:#fef2f2;color:#b91c1c">請求 期限切れ</span></div>
+            <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥330,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥330,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right;color:#4b5563">¥0</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) 208px 124px 124px 124px;height:52px;align-items:center;padding:0 24px;font-size:14px">
+            <span style="font-weight:500">採用パンフレット 制作</span><span style="color:#4b5563">株式会社ミナト製作所</span>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px"><span style="padding:3px 8px;border-radius:5px;background:#ecfdf5;color:#047857">完了</span></div>
+            <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥480,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥480,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right;color:#4b5563">¥0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="padding:0 44px 52px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid #d1d5db">
+    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;color:#4b5563">GROUP C</span>
+    <span style="font-size:15px;font-weight:600">案件詳細（最重要）</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+    <div id="s06" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">06</span>
+        <span style="font-size:14px;font-weight:500">案件詳細</span>
+        <span style="font-size:12px;color:#4b5563">見積→契約→請求の縦タイムライン / 分割請求は契約の下 / 未作成は点線プレースホルダ</span>
+      </div>
+      <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <dc-import name="Nav" active="projects" hint-size="260px,1200px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="flex:none;padding:16px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+              <span style="font-size:12px;color:#4b5563"><a href="#s05">案件</a> ／ コーポレートサイト リニューアル</span>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">コーポレートサイト リニューアル</span>
+                <dc-import name="Badge" label="進行中" tone="sent" hint-size="72px,24px"></dc-import>
+              </div>
+              <span style="font-size:14px;color:#4b5563"><a href="#s04">株式会社ミナト製作所</a> ・ 開始 2026-06-01 ・ 納期 2026-10-31</span>
+            </div>
+            <div style="display:flex;gap:8px;flex:none">
+              <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">案件を編集</button>
+              <button style="height:32px;padding:0 14px;border:none;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">完了にする</button>
+            </div>
+          </div>
+          <div style="flex:none;margin:0 24px 20px;padding:20px;border-radius:5px;background:#f1f2f4;display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#4b5563">契約金額（税込）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">¥1,000,000</span></div>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#4b5563">請求済</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">¥600,000</span></div>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#4b5563">残額</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em;color:#b91c1c">¥400,000</span></div>
+            <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:8px">
+              <div style="height:8px;border-radius:999px;background:#d1d5db;overflow:hidden;display:flex"><div style="width:38%;background:#10b981"></div><div style="width:22%;background:#2563eb"></div></div>
+              <div style="display:flex;gap:16px;font-size:12px;color:#4b5563;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#10b981"></span>入金済 ¥380,000</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#2563eb"></span>請求中 ¥220,000</span><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#e5e7eb"></span>未請求 ¥400,000</span></div>
+            </div>
+          </div>
+
+          <div style="flex:1;padding:0 24px 32px;display:flex;flex-direction:column">
+
+            <div style="display:flex;gap:16px">
+              <div style="width:24px;flex:none;display:flex;flex-direction:column;align-items:center"><div style="width:12px;height:12px;border-radius:999px;background:#38bdf8;margin-top:20px"></div><div style="flex:1;width:2px;background:#d1d5db"></div></div>
+              <div style="flex:1;min-width:0;padding-bottom:16px">
+                <div style="background:#f9fafb;border-radius:8px;overflow:hidden">
+                  <div style="padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                    <span style="font-size:12px;font-weight:500;color:#4b5563;letter-spacing:.5px">見積書</span>
+                    <a href="#s08" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;font-weight:500">EST-0093</a>
+                    <dc-import name="Badge" label="承認済" tone="ok" hint-size="72px,24px"></dc-import>
+                    <span style="flex:1"></span>
+                    <span style="font-size:12px;color:#4b5563">発行 2026-06-05 ・ 有効期限 2026-07-05</span>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;font-weight:600">¥1,000,000</span>
+                  </div>
+                  <div style="padding:16px 20px;background:#f1f2f4;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <span style="width:18px;height:18px;border-radius:4px;background:#9ca3af;flex:none"></span>
+                    <span style="font-size:14px;line-height:18px;color:#4b5563;flex:1;min-width:260px">契約 <a href="#s06">CTR-0031</a> に変換済みのため編集できません。金額を変えるには複製して新しい見積を作成してください。</span>
+                    <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">複製して新規作成</button>
+                    <button style="height:38px;padding:0 12px;border:none;border-radius:8px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8;cursor:pointer">PDFを表示</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:16px">
+              <div style="width:24px;flex:none;display:flex;flex-direction:column;align-items:center"><div style="width:12px;height:12px;border-radius:999px;background:#8b5cf6;margin-top:20px"></div><div style="flex:1;width:2px;background:#d1d5db"></div></div>
+              <div style="flex:1;min-width:0;padding-bottom:16px;display:flex;flex-direction:column;gap:12px">
+                <div style="background:#f9fafb;border-radius:8px;overflow:hidden">
+                  <div style="padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                    <span style="font-size:12px;font-weight:500;color:#4b5563;letter-spacing:.5px">契約書</span>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;font-weight:500">CTR-0031</span>
+                    <dc-import name="Badge" label="締結済" tone="ok" hint-size="72px,24px"></dc-import>
+                    <span style="flex:1"></span>
+                    <span style="font-size:12px;color:#4b5563">締結 2026-06-20 ・ 期間 2026-07-01〜2026-10-31</span>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;font-weight:600">¥1,000,000</span>
+                  </div>
+                  <div style="padding:16px 20px;background:#f1f2f4;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <span style="width:18px;height:18px;border-radius:4px;background:#9ca3af;flex:none"></span>
+                    <span style="font-size:14px;line-height:18px;color:#4b5563;flex:1;min-width:260px">請求書を発行済みのため契約内容は編集できません。条件を変更する場合は変更契約を作成します。</span>
+                    <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">変更契約を作成</button>
+                  </div>
+                  <div style="padding:16px 20px;display:flex;align-items:center;gap:16px;border-top:1px solid #d1d5db;flex-wrap:wrap">
+                    <span style="font-size:14px;color:#4b5563">請求済 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥600,000</span> / 残額 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#b91c1c">¥400,000</span></span>
+                    <span style="flex:1"></span>
+                    <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">この契約から請求書を作成</button>
+                  </div>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:10px;margin-left:20px;padding-left:24px;border-left:2px solid #d1d5db">
+                  <div style="background:#f9fafb;border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                    <span style="font-size:12px;color:#4b5563;width:48px">第1回</span>
+                    <a href="#s11" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;font-weight:500">INV-0138</a>
+                    <dc-import name="Badge" label="入金済" tone="ok" hint-size="72px,24px"></dc-import>
+                    <span style="flex:1;min-width:160px;font-size:12px;color:#4b5563">着手金 ・ 入金 2026-07-31</span>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:16px">¥380,000</span>
+                  </div>
+                  <div style="background:#fef2f2;border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                    <span style="font-size:12px;color:#b91c1c;width:48px">第2回</span>
+                    <a href="#s11" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;font-weight:500;color:#b91c1c">INV-0142</a>
+                    <div style="display:flex;gap:6px"><dc-import name="Badge" label="送付済" tone="sent" hint-size="72px,24px"></dc-import><dc-import name="Badge" label="期限切れ" tone="danger" outline="{{ true }}" hint-size="86px,24px"></dc-import></div>
+                    <span style="flex:1;min-width:160px;font-size:12px;color:#b91c1c">支払期限 2026-08-31（3日超過）</span>
+                    <button style="height:32px;padding:0 12px;border:1px solid #b91c1c;border-radius:6px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#b91c1c;cursor:pointer">督促メール</button>
+                    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:16px;color:#b91c1c">¥220,000</span>
+                  </div>
+                  <div style="border:1px dashed #d1d5db;border-radius:8px;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                    <span style="font-size:12px;color:#4b5563;width:48px">第3回</span>
+                    <span style="flex:1;min-width:220px;font-size:14px;color:#4b5563">未作成 ・ 残額 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥400,000</span> を最終請求として作成できます</span>
+                    <button style="height:32px;padding:0 14px;border:none;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">残額で請求書を作成</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:16px">
+              <div style="width:24px;flex:none;display:flex;justify-content:center"><div style="width:12px;height:12px;border-radius:999px;background:#fff;border:2px dashed #d1d5db;margin-top:20px"></div></div>
+              <div style="flex:1;min-width:0">
+                <div style="border:1px dashed #d1d5db;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:15px;font-weight:600;color:#4b5563">案件完了</span>
+                  <span style="font-size:14px;color:#4b5563">すべての請求が入金されると自動で完了候補になります（残 1件・¥620,000）</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s06e" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#4b5563;color:#fff">06-empty</span>
+        <span style="font-size:14px;font-weight:500">案件詳細（書類ゼロ）</span>
+      </div>
+      <div style="width:600px;border-radius:10px;background:#fff;padding:24px;display:flex;flex-direction:column;gap:12px;border:1px solid #d1d5db;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+        <div style="background:#eff6ff;border-radius:8px;padding:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <span style="width:12px;height:12px;border-radius:999px;background:#1d4ed8;flex:none"></span>
+          <div style="flex:1;min-width:200px;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600;color:#1d4ed8">まず見積書をつくる</span><span style="font-size:14px;color:#1d4ed8">承認されたら1クリックで契約書に引き継げます</span></div>
+          <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">見積書を作成</button>
+        </div>
+        <div style="border:1px dashed #d1d5db;border-radius:8px;padding:20px;display:flex;align-items:center;gap:16px"><span style="width:12px;height:12px;border-radius:999px;border:2px dashed #d1d5db;flex:none"></span><span style="font-size:14px;color:#4b5563">契約書 ・ 見積が承認されると作成できます</span></div>
+        <div style="border:1px dashed #d1d5db;border-radius:8px;padding:20px;display:flex;align-items:center;gap:16px"><span style="width:12px;height:12px;border-radius:999px;border:2px dashed #d1d5db;flex:none"></span><span style="font-size:14px;color:#4b5563">請求書 ・ 契約締結後に分割して作成できます</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="padding:0 44px 52px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid #d1d5db">
+    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;color:#4b5563">GROUP D</span>
+    <span style="font-size:15px;font-weight:600">見積の作成と詳細</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+    <div id="s07" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">07</span>
+        <span style="font-size:14px;font-weight:500">見積作成フォーム</span>
+        <span style="font-size:12px;color:#4b5563">フォーム入力 + 明細行エディタ（通常・工数・値引き）+ 適格請求書サマリ</span>
+      </div>
+      <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <dc-import name="Nav" active="quotes" hint-size="260px,900px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:18px;font-weight:600;letter-spacing:-.01em;color:#1f2937">見積書の作成</span>
+              <dc-import name="Badge" label="下書き" tone="draft" hint-size="72px,24px"></dc-import>
+              <span style="font-size:12px;color:#4b5563">自動保存 12:04</span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button style="height:38px;padding:0 12px;border:none;border-radius:8px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#4b5563;cursor:pointer">破棄</button>
+              <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">下書き保存</button>
+              <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">確定して送付</button>
+            </div>
+          </div>
+          <div style="flex:1;padding:8px 24px 28px;display:flex;flex-direction:column;gap:16px">
+
+            <div style="background:#f9fafb;border-radius:8px;padding:20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+              <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:12px;font-weight:500;color:#4b5563">顧客 <span style="color:#dc2626">*</span></label><div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:14px"><span>株式会社ミナト製作所</span><span style="color:#4b5563">▾</span></div></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:12px;font-weight:500;color:#4b5563">案件</label><div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:14px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">コーポレートサイト…</span><span style="color:#4b5563">▾</span></div></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:12px;font-weight:500;color:#4b5563">発行日</label><div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-09-03</div></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:12px;font-weight:500;color:#4b5563">有効期限</label><div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-10-03</div></div>
+              <div style="grid-column:span 2;display:flex;flex-direction:column;gap:6px"><label style="font-size:12px;font-weight:500;color:#1d4ed8">件名 <span style="color:#dc2626">*</span></label><div style="height:42px;border:2px solid #1d4ed8;border-radius:4px;display:flex;align-items:center;padding:0 13px;font-size:14px">コーポレートサイト リニューアル 一式</div></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:12px;font-weight:500;color:#4b5563">見積番号</label><div style="height:42px;border:1px solid #d1d5db;border-radius:4px;background:#f1f2f4;display:flex;align-items:center;padding:0 14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">EST-0098</div></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:12px;font-weight:500;color:#4b5563">税計算</label><div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:14px"><span>税抜入力 / 明細単位で切捨</span><span style="color:#4b5563">▾</span></div></div>
+            </div>
+
+            <div style="background:#f9fafb;border-radius:8px;overflow:hidden">
+              <div style="height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px"><span style="font-size:15px;font-weight:600">明細</span><span style="font-size:12px;color:#4b5563">行をドラッグして並び替え</span></div>
+              <div style="display:grid;grid-template-columns:32px minmax(0,1.5fr) minmax(0,1.7fr) 80px 128px 104px 128px 40px;align-items:center;gap:10px;height:44px;padding:0 20px;font-size:12px;font-weight:500;color:#4b5563;border-top:1px solid #d1d5db;border-bottom:1px solid #d1d5db">
+                <span></span><span>品名</span><span>説明</span><span style="text-align:right">数量</span><span style="text-align:right">単価（税抜）</span><span>税率</span><span style="text-align:right">金額</span><span></span>
+              </div>
+              <div style="display:grid;grid-template-columns:32px minmax(0,1.5fr) minmax(0,1.7fr) 80px 128px 104px 128px 40px;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid #d1d5db">
+                <span style="color:#4b5563;font-size:16px;text-align:center;cursor:grab">⠿</span>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 12px;font-size:14px;background:#fff;overflow:hidden">ワイヤーフレーム設計</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 12px;font-size:14px;color:#4b5563;background:#fff;overflow:hidden">全12ページ・2回改訂まで</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;background:#fff">1</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;background:#fff">600</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:14px;background:#fff"><span>10%</span><span style="color:#4b5563">▾</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px;text-align:right">¥600</span>
+                <span style="text-align:center;color:#4b5563;font-size:18px;cursor:pointer">×</span>
+              </div>
+              <div style="display:grid;grid-template-columns:32px minmax(0,1.5fr) minmax(0,1.7fr) 80px 128px 104px 128px 40px;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid #d1d5db;background:#f1f2f4">
+                <span style="color:#4b5563;font-size:16px;text-align:center;cursor:grab">⠿</span>
+                <div style="height:40px;border:2px solid #1d4ed8;border-radius:4px;display:flex;align-items:center;padding:0 11px;font-size:14px;background:#fff;overflow:hidden">UIデザイン</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 12px;font-size:14px;color:#4b5563;background:#fff;overflow:hidden">TOP + 下層5テンプレート</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;background:#fff">1</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;background:#fff">400</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:14px;background:#fff"><span>10%</span><span style="color:#4b5563">▾</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px;text-align:right">¥400</span>
+                <span style="text-align:center;color:#4b5563;font-size:18px;cursor:pointer">×</span>
+              </div>
+              <div style="display:grid;grid-template-columns:32px minmax(0,1.5fr) minmax(0,1.7fr) 80px 128px 104px 128px 40px;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid #d1d5db">
+                <span style="color:#4b5563;font-size:16px;text-align:center;cursor:grab">⠿</span>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 12px;font-size:14px;background:#fff;overflow:hidden">進行ハンドブック（印刷物）</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 12px;font-size:14px;color:#4b5563;background:#fff;overflow:hidden">軽減税率対象</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;background:#fff">1</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;background:#fff">999</div>
+                <div style="height:40px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:14px;background:#fff"><span>8%</span><span style="color:#4b5563">▾</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px;text-align:right">¥999</span>
+                <span style="text-align:center;color:#4b5563;font-size:18px;cursor:pointer">×</span>
+              </div>
+              <div style="padding:14px 20px;border-top:1px solid #d1d5db;display:flex;flex-direction:column;gap:10px;background:#f9fafb">
+                <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4b5563">行の種類</span>
+                <div style="display:flex;align-items:center;gap:12px;font-size:14px">
+                  <span style="width:88px;flex:none;font-size:12px;color:#4b5563">通常</span>
+                  <span style="flex:1;min-width:0">UIデザイン</span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563;width:120px;text-align:right">1 × ¥400,000</span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:120px;text-align:right">¥400,000</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;font-size:14px">
+                  <span style="width:88px;flex:none;font-size:12px;color:#4b5563">工数</span>
+                  <span style="flex:1;min-width:0">実装（人日精算）<span style="margin-left:8px;font-size:12px;padding:2px 8px;border-radius:999px;background:#f0f9ff;color:#0369a1">単位 人日</span></span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563;width:120px;text-align:right">12 × ¥50,000</span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:120px;text-align:right">¥600,000</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;font-size:14px">
+                  <span style="width:88px;flex:none;font-size:12px;color:#4b5563">値引き</span>
+                  <span style="flex:1;min-width:0">継続割引（10%）<span style="margin-left:8px;font-size:12px;padding:2px 8px;border-radius:999px;background:#fef2f2;color:#b91c1c">マイナス行</span></span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:13px;color:#4b5563;width:120px;text-align:right">1 × -¥100,000</span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:500;width:120px;text-align:right;color:#b91c1c">-¥100,000</span>
+                </div>
+                <span style="font-size:12px;line-height:18px;color:#4b5563">工数行は数量の単位を「人日／時間」に切替（金額計算は同じ）。値引き行は単価をマイナスで入力し、同じ税率の課税対象額から差し引く（税率混在時は税率ごとに按分）。</span>
+              </div>
+              <div style="padding:12px 20px;display:flex;gap:8px">
+                <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">＋ 行を追加</button>
+                <button style="height:38px;padding:0 12px;border:none;border-radius:8px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8;cursor:pointer">よく使う品目から追加</button>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start">
+              <div style="background:#f9fafb;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:8px">
+                <label style="font-size:12px;font-weight:500;color:#4b5563">備考</label>
+                <div style="min-height:104px;border:1px solid #d1d5db;border-radius:4px;padding:12px 14px;font-size:14px;line-height:22px;background:#fff">・本見積の有効期限は発行日から30日間です。<br>・登録番号 T7010001034567（適格請求書発行事業者）</div>
+              </div>
+              <div style="background:#f1f2f4;border-radius:8px;overflow:hidden">
+                <div style="height:40px;display:flex;align-items:center;padding:0 20px;font-size:15px;font-weight:600">金額サマリ（税率別）</div>
+                <div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px;border-top:1px solid #d1d5db">
+                  <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);align-items:baseline;font-size:14px;color:#4b5563"><span style="font-weight:500;color:#1f2937">10%対象</span><span style="text-align:right">小計 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥1,000</span></span><span style="text-align:right">消費税 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥100</span></span></div>
+                  <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);align-items:baseline;font-size:14px;color:#4b5563"><span style="font-weight:500;color:#1f2937">8%対象</span><span style="text-align:right">小計 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥999</span></span><span style="text-align:right">消費税 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥79</span></span></div>
+                </div>
+                <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;border-top:1px solid #d1d5db">
+                  <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>税抜合計</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥1,999</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>消費税合計</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥179</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;border-top:1px solid #d1d5db"><span style="font-size:15px;font-weight:600">合計（税込）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">¥2,178</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s07m" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#4b5563;color:#fff">07-sp</span>
+        <span style="font-size:14px;font-weight:500">明細（スマホ 390px）</span>
+        <span style="font-size:12px;color:#4b5563">1行＝1カード / iOS タブバー 49pt</span>
+      </div>
+      <div style="width:390px;height:960px;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <div style="height:52px;flex:none;display:flex;align-items:center;gap:12px;padding:0 16px">
+          <span style="font-size:20px;color:#4b5563">☰</span><span style="font-size:18px;font-weight:600;letter-spacing:-.01em;color:#1f2937">見積書</span><span style="flex:1"></span><dc-import name="Badge" label="下書き" tone="draft" hint-size="72px,24px"></dc-import>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:8px 16px 16px;display:flex;flex-direction:column;gap:12px">
+          <div style="background:#f1f2f4;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#4b5563"><span>顧客</span><span style="color:#1f2937">株式会社ミナト製作所</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#4b5563"><span>案件</span><span style="color:#1f2937;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">コーポレートサイト…</span></div>
+          </div>
+          <span style="font-size:12px;font-weight:500;color:#4b5563">明細 3件</span>
+          <div style="background:#f9fafb;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#4b5563">01</span><div style="flex:1;height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 12px;font-size:14px;background:#fff;min-width:0;overflow:hidden">ワイヤーフレーム設計</div><span style="color:#4b5563;font-size:18px">×</span></div>
+            <div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;padding:0 12px;font-size:14px;color:#4b5563;background:#fff">全12ページ・2回改訂まで</div>
+            <div style="display:grid;grid-template-columns:72px minmax(0,1fr) 88px;gap:10px">
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;background:#fff">1</div>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;background:#fff">600</div>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:14px;background:#fff"><span>10%</span><span>▾</span></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;border-top:1px solid #d1d5db"><span style="font-size:12px;color:#4b5563">金額（自動）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600">¥600</span></div>
+          </div>
+          <div style="background:#f9fafb;border-radius:8px;padding:16px;display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#4b5563">02</span><span style="flex:1;font-size:14px">UIデザイン</span><span style="font-size:12px;color:#4b5563">10%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px">¥400</span></div>
+          <div style="background:#f9fafb;border-radius:8px;padding:16px;display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#4b5563">03</span><span style="flex:1;font-size:14px">進行ハンドブック</span><span style="font-size:12px;color:#4b5563">8%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;font-size:14px">¥999</span></div>
+          <button style="height:40px;border:1px solid #d1d5db;border-radius:6px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8">＋ 行を追加</button>
+        </div>
+        <div style="flex:none;padding:16px;background:#f1f2f4;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563"><span>10%対象</span><span>小計 ¥1,000 / 税 ¥100</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563"><span>8%対象</span><span>小計 ¥999 / 税 ¥79</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:600">合計（税込）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">¥2,178</span></div>
+          <button style="height:56px;border:none;border-radius:10px;background:#1d4ed8;color:#fff;font-family:inherit;font-size:15px;font-weight:600">保存して送付</button>
+        </div>
+        <div style="flex:none;height:80px;background:#f1f2f4;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;justify-items:center;padding-bottom:8px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:64px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#4b5563">ホーム</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:64px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#4b5563">顧客</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:64px;height:32px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#1d4ed8">案件</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:64px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#4b5563">書類</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s07z" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#4b5563;color:#fff">07-zero</span>
+        <span style="font-size:14px;font-weight:500">明細0行</span>
+      </div>
+      <div style="width:600px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <div style="height:40px;display:flex;align-items:center;padding:0 20px;font-size:15px;font-weight:600">明細</div>
+        <div style="padding:40px 24px;background:#f9fafb;display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div style="width:200px;height:8px;border-radius:999px;background:#d1d5db"></div>
+          <span style="font-size:15px;font-weight:600">明細がまだありません</span>
+          <span style="font-size:14px;line-height:18px;color:#4b5563;text-align:center;max-width:360px">品名・数量・単価を入力すると、税率別の小計と消費税が自動で計算されます。</span>
+          <div style="display:flex;gap:8px;padding-top:4px"><button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">＋ 最初の行を追加</button><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">過去の見積からコピー</button></div>
+        </div>
+        <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#4b5563">合計（税込）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:22px;color:#4b5563">¥0</span></div>
+        <div style="padding:0 20px 20px;display:flex;gap:12px;align-items:center"><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#f1f2f4;color:#9ca3af;font-family:inherit;font-size:14px;font-weight:500">確定して送付</button><span style="font-size:12px;color:#4b5563">明細が0行のため送付できません</span></div>
+      </div>
+    </div>
+
+    <div id="s08" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">08</span>
+        <span style="font-size:14px;font-weight:500">見積詳細</span>
+        <span style="font-size:12px;color:#4b5563">承認済 → 契約へ / 編集ロックの説明</span>
+      </div>
+      <div style="width:960px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05);display:flex;flex-direction:column">
+        <div style="padding:16px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+            <span style="font-size:12px;color:#4b5563"><a href="#s11">見積書</a> ／ EST-0093</span>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">EST-0093</span><dc-import name="Badge" label="承認済" tone="ok" hint-size="72px,24px"></dc-import><span style="font-size:14px;color:#4b5563">コーポレートサイト リニューアル 一式</span></div>
+            <span style="font-size:12px;color:#4b5563">株式会社ミナト製作所 ・ 発行 2026-06-05 ・ 有効期限 2026-07-05 ・ 承認 2026-06-18</span>
+          </div>
+          <div style="display:flex;gap:8px;flex:none">
+            <button style="height:38px;padding:0 12px;border:none;border-radius:8px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8;cursor:pointer">複製</button>
+            <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">PDF</button>
+            <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">契約書を作成</button>
+          </div>
+        </div>
+        <div style="margin:0 24px 16px;padding:16px 20px;border-radius:5px;background:#f1f2f4;display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+          <span style="width:18px;height:18px;border-radius:4px;background:#9ca3af;flex:none;margin-top:2px"></span>
+          <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:280px">
+            <span style="font-size:15px;font-weight:600">編集はロックされています</span>
+            <span style="font-size:14px;line-height:18px;color:#4b5563">契約 <a href="#s06">CTR-0031</a> に変換済みです。承認後の見積を書き換えると契約金額との整合が取れないため、内容変更は<b>複製して新しい見積を作成</b>してください。取消が必要な場合は契約側を先にキャンセルします。</span>
+          </div>
+          <button style="height:32px;padding:0 14px;border:none;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">複製して新規作成</button>
+        </div>
+        <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#f9fafb;border-radius:8px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,2fr) 64px 120px 64px 120px;height:28px;align-items:center;gap:12px;padding:0 20px;font-size:12px;font-weight:500;color:#4b5563;border-bottom:1px solid #d1d5db"><span>品名</span><span>説明</span><span style="text-align:right">数量</span><span style="text-align:right">単価</span><span style="text-align:right">税率</span><span style="text-align:right">金額</span></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,2fr) 64px 120px 64px 120px;height:34px;align-items:center;gap:12px;padding:0 20px;font-size:14px;border-bottom:1px solid #d1d5db"><span>要件定義・情報設計</span><span style="color:#4b5563">全12ページ</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">1</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right">¥300,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">10%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥300,000</span></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,2fr) 64px 120px 64px 120px;height:34px;align-items:center;gap:12px;padding:0 20px;font-size:14px;border-bottom:1px solid #d1d5db"><span>UIデザイン</span><span style="color:#4b5563">TOP + 下層5テンプレート</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">1</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right">¥380,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">10%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥380,000</span></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,2fr) 64px 120px 64px 120px;height:34px;align-items:center;gap:12px;padding:0 20px;font-size:14px"><span>実装・CMS組み込み</span><span style="color:#4b5563">WordPress</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">1</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right">¥229,091</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right">10%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;text-align:right">¥229,091</span></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <div style="width:360px;background:#f1f2f4;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>10%対象 小計</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥909,091</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>消費税（10%）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-weight:500;color:#1f2937">¥90,909</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;border-top:1px solid #d1d5db"><span style="font-size:15px;font-weight:600">合計（税込）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em">¥1,000,000</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="padding:0 44px 52px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid #d1d5db">
+    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;color:#4b5563">GROUP E</span>
+    <span style="font-size:15px;font-weight:600">契約変換・分割請求・一覧・設定</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+    <div id="s09" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">09</span>
+        <span style="font-size:15px;font-weight:600">契約作成（見積からの変換）</span>
+        <span style="font-size:12px;color:#4b5563">引き継ぎ元を明示 / 金額差分を記録</span>
+      </div>
+      <div style="width:960px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05);display:flex;flex-direction:column">
+        <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:15px;font-weight:600">契約書の作成</span><dc-import name="Badge" label="下書き" tone="draft" hint-size="64px,20px"></dc-import></div>
+          <div style="display:flex;gap:8px"><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">下書き保存</button><button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">確定して送付</button></div>
+        </div>
+        <div style="padding:12px 16px;background:#eff6ff;border-bottom:1px solid #eff6ff;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="width:16px;height:16px;border-radius:999px;background:#1d4ed8;flex:none"></span>
+          <span style="font-size:14px;line-height:18px;color:#1d4ed8;flex:1;min-width:280px">見積 <a href="#s08">EST-0093</a>（承認済）から顧客・件名・明細・金額を引き継ぎました。金額を変更すると見積との差分が記録されます。</span>
+          <button style="height:36px;padding:0 14px;border:1px solid #eff6ff;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8;cursor:pointer">引き継ぎ元を表示</button>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:#f9fafb">
+          <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:0">
+            <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 120px minmax(0,1fr);gap:12px 16px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f2f4">
+              <label style="font-size:14px;color:#4b5563;text-align:right">顧客</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:6px;background:#f1f2f4;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#4b5563">株式会社ミナト製作所<span style="margin-left:8px;font-size:12px;color:#4b5563">引継</span></div>
+              <label style="font-size:14px;color:#4b5563;text-align:right">契約書番号</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:6px;background:#f1f2f4;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#4b5563">CTR-0031</div>
+            </div>
+            <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 120px minmax(0,1fr);gap:12px 16px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f2f4">
+              <label style="font-size:14px;color:#4b5563;text-align:right">件名</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-size:14px">コーポレートサイト リニューアル 一式</div>
+              <label style="font-size:14px;color:#4b5563;text-align:right">契約種別</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;font-size:14px"><span>業務委託（請負）</span><span style="color:#4b5563">⌄</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 120px minmax(0,1fr);gap:12px 16px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f2f4">
+              <label style="font-size:14px;color:#4b5563;text-align:right">締結予定日</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-06-20</div>
+              <label style="font-size:14px;color:#4b5563;text-align:right">支払条件</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;font-size:14px"><span>月末締 翌月末払</span><span style="color:#4b5563">⌄</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 120px minmax(0,1fr);gap:12px 16px;align-items:center;padding:8px 0">
+              <label style="font-size:14px;color:#4b5563;text-align:right">履行期間</label>
+              <div style="display:flex;align-items:center;gap:8px"><div style="height:42px;flex:1;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-07-01</div><span style="color:#4b5563">–</span><div style="height:42px;flex:1;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-10-31</div></div>
+              <span></span><span></span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;overflow:hidden">
+            <div style="height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #d1d5db;background:#f9fafb"><span style="font-size:15px;font-weight:600">引き継いだ明細 3行</span><button style="height:32px;padding:0 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer">明細を編集</button></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:0 14px;height:32px;border-bottom:1px solid #f1f2f4;font-size:14px"><span style="flex:1">要件定義・情報設計</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums">¥300,000</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:0 14px;height:32px;border-bottom:1px solid #f1f2f4;font-size:14px"><span style="flex:1">UIデザイン</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums">¥380,000</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:0 14px;height:32px;border-bottom:1px solid #d1d5db;font-size:14px"><span style="flex:1">実装・CMS組み込み</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums">¥229,091</span></div>
+            <div style="padding:12px 14px;display:flex;justify-content:flex-end;gap:28px;align-items:baseline;background:#f9fafb">
+              <span style="font-size:12px;color:#4b5563">見積金額 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-decoration:line-through">¥1,000,000</span></span>
+              <span style="font-size:12px;color:#4b5563">契約金額（税込） <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;color:#1f2937;letter-spacing:-.01em">¥1,000,000</span></span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:15px;font-weight:600">請求スケジュール（任意）</span>
+            <div style="display:flex;gap:12px;align-items:center;font-size:14px;color:#4b5563"><span style="width:48px">第1回</span><div style="width:72px;height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace">38</div><span>%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥380,000</span><span style="color:#4b5563">着手時</span></div>
+            <div style="display:flex;gap:12px;align-items:center;font-size:14px;color:#4b5563"><span style="width:48px">第2回</span><div style="width:72px;height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace">22</div><span>%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥220,000</span><span style="color:#4b5563">中間</span></div>
+            <div style="display:flex;gap:12px;align-items:center;font-size:14px;color:#4b5563"><span style="width:48px">第3回</span><div style="width:72px;height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace">40</div><span>%</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥400,000</span><span style="color:#4b5563">検収後</span></div>
+            <span style="font-size:12px;color:#4b5563">合計 100% ・ 予定は請求作成時の初期値として使われます</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s10" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">10</span>
+        <span style="font-size:15px;font-weight:600">請求作成（分割請求）</span>
+        <span style="font-size:12px;color:#4b5563">契約残額 / 超過エラー / 源泉徴収</span>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+        <div style="width:760px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05);display:flex;flex-direction:column">
+          <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:15px;font-weight:600">請求書の作成（第3回）</span><dc-import name="Badge" label="下書き" tone="draft" hint-size="64px,20px"></dc-import></div>
+            <div style="display:flex;gap:8px"><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">下書き保存</button><button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">確定して送付</button></div>
+          </div>
+          <div style="padding:14px 16px;border-bottom:1px solid #d1d5db;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#4b5563">契約 <a href="#s06">CTR-0031</a></span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;font-weight:600">¥1,000,000</span></div>
+            <span style="font-size:16px;color:#4b5563">−</span>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#4b5563">請求済（2件）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;font-weight:600">¥600,000</span></div>
+            <span style="font-size:16px;color:#4b5563">=</span>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#4b5563">残額</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;color:#047857">¥400,000</span></div>
+            <button style="margin-left:auto;height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">残額で埋める</button>
+          </div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:#f9fafb">
+            <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:120px minmax(0,1fr) 120px minmax(0,1fr);gap:12px 16px;align-items:center">
+              <label style="font-size:14px;color:#4b5563;text-align:right">請求回</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;font-size:14px"><span>第3回（最終）</span><span style="color:#4b5563">⌄</span></div>
+              <label style="font-size:14px;color:#4b5563;text-align:right">発行日</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-09-30</div>
+              <label style="font-size:14px;color:#4b5563;text-align:right">支払期限</label>
+              <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-10-31</div>
+              <span></span><span></span>
+            </div>
+            <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;overflow:hidden">
+              <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid #d1d5db;background:#f9fafb;font-size:12px;font-weight:600;color:#4b5563">請求明細</div>
+              <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 80px 132px 76px 124px;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f1f2f4">
+                <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-size:14px;overflow:hidden">コーポレートサイト制作（検収後 最終）</div>
+                <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">1</div>
+                <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px">363,636</div>
+                <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 8px;font-size:12px"><span>10%</span><span style="color:#4b5563">⌄</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;text-align:right">¥363,636</span>
+              </div>
+              <div style="padding:10px 14px"><button style="height:28px;padding:0 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-family:inherit;font-size:14px;color:#1d4ed8;cursor:pointer">＋ 行を追加</button></div>
+            </div>
+            <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:1px"><span style="font-size:15px;font-weight:600">源泉徴収</span><span style="font-size:12px;color:#4b5563">税抜額 × 10.21% を差し引いて請求します</span></div>
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:40px;height:24px;border-radius:999px;background:#2563eb;position:relative;display:inline-block"><span style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)"></span></span><span style="font-size:12px;color:#4b5563">ON</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;padding-top:12px;border-top:1px solid #f0f0f2">
+                <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>10%対象 小計</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥363,636</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>消費税合計</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥36,364</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>合計（税込）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥400,000</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>源泉徴収（10.21%）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#b91c1c">-¥37,127</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;border-top:1px solid #d1d5db"><span style="font-size:15px;font-weight:600">差引請求額</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:24px;font-weight:600;letter-spacing:-.02em">¥362,873</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div id="s10e" style="width:420px;border-radius:10px;overflow:hidden;background:#fff;border:1px solid #fef2f2;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+            <div style="padding:10px 14px;background:#fef2f2;border-bottom:1px solid #fef2f2"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#b91c1c">state: over-contract</span></div>
+            <div style="padding:14px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563"><span>契約 ¥1,000,000</span><span>請求済 ¥600,000</span><span>残額 ¥400,000</span></div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#4b5563">請求額（税抜）</label>
+                <div style="height:32px;border:1px solid #ef4444;border-radius:8px;box-shadow:0 0 0 4px rgba(239,68,68,.15);display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;color:#b91c1c">500,000</div>
+                <div style="display:flex;gap:8px;align-items:flex-start"><span style="width:14px;height:14px;border-radius:999px;background:#dc2626;flex:none;margin-top:2px"></span><span style="font-size:12px;line-height:17px;color:#b91c1c">契約残額 ¥400,000 を <b>¥100,000</b> 超えています。金額を修正するか、変更契約で契約金額を増額してください。</span></div>
+              </div>
+              <div style="display:flex;gap:8px"><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">残額 ¥400,000 にする</button><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">変更契約を作成</button></div>
+              <div style="display:flex;gap:10px;align-items:center;padding-top:12px;border-top:1px solid #f0f0f2"><button style="height:28px;padding:0 12px;border:none;border-radius:6px;background:#e8e8ed;color:#9ca3af;font-family:inherit;font-size:14px;font-weight:500">確定して送付</button><span style="font-size:12px;color:#4b5563">エラー解消まで無効</span></div>
+            </div>
+          </div>
+          <div id="s10w" style="width:420px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+            <div style="padding:10px 14px;border-bottom:1px solid #d1d5db;background:#f9fafb;display:flex;align-items:center;justify-content:space-between"><span style="font-size:15px;font-weight:600">源泉徴収あり（別契約の例）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#4b5563">withholding</span></div>
+            <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>合計（税込）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥1,100,000</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#4b5563"><span>源泉徴収（10.21% / 税抜 ¥1,000,000）</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#b91c1c">-¥102,100</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;border-top:1px solid #d1d5db"><span style="font-size:15px;font-weight:600">差引請求額</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:24px;font-weight:600;letter-spacing:-.02em">¥997,900</span></div>
+              <span style="font-size:12px;line-height:16px;color:#4b5563">※ 支払金額が100万円を超える場合の段階計算（超過分20.42%）は未対応。設定で税率を上書きできます。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s11" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">11</span>
+        <span style="font-size:15px;font-weight:600">書類一覧（3種共通レイアウト）</span>
+        <span style="font-size:12px;color:#4b5563">セグメンテッドコントロールで種別切替 / 列は1〜2列だけ差し替え</span>
+      </div>
+      <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <dc-import name="Nav" active="invoices" hint-size="260px,600px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+            <div style="display:flex;padding:2px;border-radius:7px;background:#e8e8ed;gap:2px">
+              <span style="height:24px;padding:0 14px;display:inline-flex;align-items:center;border-radius:5px;font-size:14px;color:#1f2937">見積書 12</span>
+              <span style="height:24px;padding:0 14px;display:inline-flex;align-items:center;border-radius:5px;font-size:14px;color:#1f2937">契約書 6</span>
+              <span style="height:24px;padding:0 14px;display:inline-flex;align-items:center;border-radius:5px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.12);font-size:15px;font-weight:600;color:#1f2937">請求書 19</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div style="width:200px;height:42px;border-radius:6px;background:#fff;border:1px solid #d1d5db;display:flex;align-items:center;gap:8px;padding:0 10px"><span style="width:12px;height:12px;border-radius:999px;border:2px solid #86868b;flex:none"></span><span style="font-size:12px;color:#4b5563">番号・顧客・件名</span></div>
+              <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">請求書を作成</button>
+            </div>
+          </div>
+          <div style="flex:none;padding:8px 16px;border-bottom:1px solid #d1d5db;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <span style="font-size:12px;color:#4b5563;margin-right:4px">絞り込み</span>
+            <span style="height:22px;padding:0 10px;display:inline-flex;align-items:center;border-radius:11px;background:#1d4ed8;color:#fff;font-size:12px;font-weight:500">すべて</span>
+            <span style="height:22px;padding:0 10px;display:inline-flex;align-items:center;border-radius:11px;background:#f1f2f4;color:#4b5563;font-size:12px">下書き 3</span>
+            <span style="height:22px;padding:0 10px;display:inline-flex;align-items:center;border-radius:11px;background:#f1f2f4;color:#4b5563;font-size:12px">送付済 6</span>
+            <span style="height:22px;padding:0 10px;display:inline-flex;align-items:center;border-radius:11px;background:#f1f2f4;color:#4b5563;font-size:12px">入金済 10</span>
+            <span style="height:22px;padding:0 10px;display:inline-flex;align-items:center;border-radius:11px;background:#fef2f2;color:#b91c1c;font-size:12px">期限切れ 1</span>
+            <span style="flex:1"></span>
+            <span style="font-size:12px;color:#4b5563">合計 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#1f2937">¥4,182,000</span></span>
+          </div>
+          <div style="display:grid;grid-template-columns:104px minmax(0,1.5fr) minmax(0,1.2fr) 128px 124px 104px 104px;height:40px;align-items:center;gap:10px;padding:0 24px;background:#f9fafb;border-bottom:1px solid #d1d5db;font-size:12px;font-weight:600;color:#4b5563"><span>番号</span><span>件名</span><span>顧客</span><span>ステータス</span><span style="text-align:right">金額（税込）</span><span style="text-align:right">発行日</span><span style="text-align:right">支払期限</span></div>
+          <div style="display:grid;grid-template-columns:104px minmax(0,1.5fr) minmax(0,1.2fr) 128px 124px 104px 104px;height:48px;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid #f1f2f4;font-size:14px"><a href="#s11" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">INV-0147</a><span>コーポレートサイト（第2回）</span><span style="color:#4b5563">株式会社ソラモト</span><dc-import name="Badge" label="送付済" tone="sent" hint-size="64px,20px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right">¥330,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">09-01</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">09-09</span></div>
+          <div style="display:grid;grid-template-columns:104px minmax(0,1.5fr) minmax(0,1.2fr) 128px 124px 104px 104px;height:48px;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid #f1f2f4;font-size:14px;background:#fef2f2"><a href="#s11" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">INV-0142</a><span>コーポレートサイト（第2回）</span><span style="color:#4b5563">株式会社ミナト製作所</span><dc-import name="Badge" label="期限切れ" tone="danger" hint-size="72px,20px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right">¥220,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">07-31</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#b91c1c;font-size:12px">08-31</span></div>
+          <div style="display:grid;grid-template-columns:104px minmax(0,1.5fr) minmax(0,1.2fr) 128px 124px 104px 104px;height:48px;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid #f1f2f4;font-size:14px"><a href="#s11" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">INV-0138</a><span>コーポレートサイト（第1回）</span><span style="color:#4b5563">株式会社ミナト製作所</span><dc-import name="Badge" label="入金済" tone="ok" hint-size="64px,20px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right">¥380,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">06-30</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">07-31</span></div>
+          <div style="display:grid;grid-template-columns:104px minmax(0,1.5fr) minmax(0,1.2fr) 128px 124px 104px 104px;height:48px;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid #f1f2f4;font-size:14px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#4b5563">INV-0136</span><span>採用パンフレット 制作</span><span style="color:#4b5563">株式会社ミナト製作所</span><dc-import name="Badge" label="下書き" tone="draft" hint-size="64px,20px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right">¥480,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">—</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">—</span></div>
+          <div style="display:grid;grid-template-columns:104px minmax(0,1.5fr) minmax(0,1.2fr) 128px 124px 104px 104px;height:48px;align-items:center;gap:10px;padding:0 16px;font-size:14px"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#4b5563">INV-0129</span><span style="color:#4b5563;text-decoration:line-through">ロゴ制作（中止）</span><span style="color:#4b5563">合同会社アオイ</span><dc-import name="Badge" label="キャンセル" tone="neutral" hint-size="80px,20px"></dc-import><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right;color:#4b5563">¥120,000</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">05-20</span><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;color:#4b5563;font-size:12px">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s14" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:12px;font-weight:500;height:24px;padding:0 10px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">14</span>
+        <span style="font-size:14px;font-weight:500">一括入金消込</span>
+        <span style="font-size:12px;color:#4b5563">銀行明細と未入金請求の突合 / 完全一致・差額・候補なしの3状態</span>
+      </div>
+      <div style="width:1280px;border-radius:12px;overflow:hidden;display:flex;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+        <dc-import name="Nav" active="invoices" hint-size="260px,640px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db">
+            <div style="display:flex;flex-direction:column;gap:1px">
+              <span style="font-size:18px;font-weight:600;letter-spacing:-.01em;color:#1f2937">入金消込</span>
+              <span style="font-size:12px;color:#4b5563">2026-09-01〜09-14 の入金 5件 / 未消込 ¥1,150,000</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">CSVを取り込む</button>
+              <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">候補を自動照合</button>
+            </div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0">
+            <div style="border-right:1px solid #d1d5db;display:flex;flex-direction:column;min-width:0">
+              <div style="height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#f9fafb;border-bottom:1px solid #d1d5db"><span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4b5563">取り込んだ入金</span><span style="font-size:12px;color:#4b5563">5件</span></div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4;background:#eff6ff">
+                <span style="width:18px;height:18px;flex:none;border-radius:5px;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px">✓</span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;color:#1f2937">ミナトセイサクショ</span><span style="font-size:12px;color:#4b5563">09-10 ・ 普通 1234567</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:500">¥220,000</span>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4;background:#eff6ff">
+                <span style="width:18px;height:18px;flex:none;border-radius:5px;background:#2563eb;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px">✓</span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;color:#1f2937">カ）ソラモト</span><span style="font-size:12px;color:#4b5563">09-12 ・ 振込手数料 ¥330 差引</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:500">¥329,670</span>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4">
+                <span style="width:18px;height:18px;flex:none;border-radius:5px;border:1px solid #d1d5db;background:#fff"></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;color:#1f2937">ゴウドウガイシャアオイ</span><span style="font-size:12px;color:#4b5563">09-13</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:500">¥480,000</span>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4">
+                <span style="width:18px;height:18px;flex:none;border-radius:5px;border:1px solid #d1d5db;background:#fff"></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;color:#1f2937">タナカ リョウ</span><span style="font-size:12px;color:#4b5563">09-14 ・ 自己資金の入金</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:500">¥50,000</span>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px">
+                <span style="width:18px;height:18px;flex:none;border-radius:5px;border:1px solid #d1d5db;background:#fff"></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;color:#1f2937">ナカムラデザイン</span><span style="font-size:12px;color:#4b5563">09-14</span></div>
+                <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:500">¥70,000</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;min-width:0">
+              <div style="height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#f9fafb;border-bottom:1px solid #d1d5db"><span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4b5563">照合候補</span><span style="font-size:12px;color:#4b5563">自動一致 2件 / 要確認 3件</span></div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;color:#1f2937"><a href="#s11">INV-0142</a> ・ 株式会社ミナト製作所</span><span style="font-size:12px;color:#4b5563">請求 ¥220,000 ・ 期限 08-31</span></div>
+                <dc-import name="Badge" label="完全一致" tone="ok" hint-size="76px,24px"></dc-import>
+                <button style="height:32px;padding:0 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:#1f2937;cursor:pointer">解除</button>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;color:#1f2937"><a href="#s11">INV-0147</a> ・ 株式会社ソラモト</span><span style="font-size:12px;color:#b45309">請求 ¥330,000 / 入金 ¥329,670 ・ 差額 -¥330</span></div>
+                <dc-import name="Badge" label="差額あり" tone="warn" hint-size="76px,24px"></dc-import>
+                <button style="height:32px;padding:0 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:#1f2937;cursor:pointer">手数料で処理</button>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;color:#1f2937">EST-0091 ・ 合同会社アオイ</span><span style="font-size:12px;color:#4b5563">請求書が未発行のため消込できません</span></div>
+                <dc-import name="Badge" label="請求未発行" tone="neutral" hint-size="76px,24px"></dc-import>
+                <button style="height:32px;padding:0 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:#1f2937;cursor:pointer">請求書を作成</button>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f2f4">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;color:#1f2937">候補なし</span><span style="font-size:12px;color:#4b5563">タナカ リョウ ¥50,000 ・ 事業外の入金として除外できます</span></div>
+                <dc-import name="Badge" label="候補なし" tone="draft" hint-size="76px,24px"></dc-import>
+                <button style="height:32px;padding:0 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:#1f2937;cursor:pointer">対象外にする</button>
+              </div>
+              <div style="padding:12px 20px;display:flex;align-items:center;gap:12px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;color:#1f2937">分割入金の候補</span><span style="font-size:12px;color:#4b5563">ナカムラデザイン ¥70,000 → INV-0151（¥140,000）の一部として充当</span></div>
+                <dc-import name="Badge" label="一部入金" tone="sent" hint-size="76px,24px"></dc-import>
+                <button style="height:32px;padding:0 12px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer">充当する</button>
+              </div>
+            </div>
+          </div>
+          <div style="flex:none;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-top:1px solid #d1d5db;background:#f9fafb">
+            <span style="font-size:14px;color:#4b5563">選択 2件 ・ 消込合計 <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:16px;font-weight:600;color:#1f2937">¥549,670</span>（差額 -¥330 は支払手数料として計上）</span>
+            <div style="display:flex;gap:8px">
+              <button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer">選択を解除</button>
+              <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">2件を入金済にする</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s12" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">12</span>
+        <span style="font-size:15px;font-weight:600">設定</span>
+        <span style="font-size:12px;color:#4b5563">左ナビ + カード区切りのフォーム</span>
+      </div>
+      <div style="width:960px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #d1d5db;box-shadow:0 1px 2px rgba(0,0,0,.05);display:flex;flex-direction:column">
+        <div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;background:#fff;border-bottom:1px solid #d1d5db"><span style="font-size:15px;font-weight:600">設定</span><button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">変更を保存</button></div>
+        <div style="display:flex;flex:1">
+          <div style="width:184px;flex:none;border-right:1px solid #d1d5db;background:#f9fafb;padding:8px;display:flex;flex-direction:column;gap:1px">
+            <span style="height:28px;display:flex;align-items:center;padding:0 10px;border-radius:6px;background:#1d4ed8;color:#fff;font-size:15px;font-weight:600">事業者情報</span>
+            <span style="height:28px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">税と源泉徴収</span>
+            <span style="height:28px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">書類番号</span>
+            <span style="height:28px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">既定の文言</span>
+            <span style="height:28px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">表示・テーマ</span>
+            <span style="height:28px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">アカウント</span>
+          </div>
+          <div style="flex:1;min-width:0;padding:16px;background:#f9fafb;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:#4b5563;letter-spacing:.02em">事業者情報</span>
+              <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:6px 14px">
+                <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f2f4"><label style="font-size:14px;color:#4b5563;text-align:right">屋号・氏名</label><div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-size:14px">田中諒デザイン事務所</div></div>
+                <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f2f4"><label style="font-size:14px;color:#4b5563;text-align:right">登録番号</label><div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">T7010001034567</div></div>
+                <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;padding:8px 0"><label style="font-size:14px;color:#4b5563;text-align:right">振込先</label><div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-size:14px">さくら銀行 品川支店 普通 1234567 タナカ リョウ</div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:#4b5563;letter-spacing:.02em">税と源泉徴収</span>
+              <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:6px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid #f1f2f4"><div style="display:flex;flex-direction:column;gap:1px"><span style="font-size:14px">源泉徴収を既定でONにする</span><span style="font-size:12px;color:#4b5563">顧客ごとの設定で上書きできます</span></div><span style="width:40px;height:24px;border-radius:999px;background:#e8e8ed;position:relative;display:inline-block;flex:none"><span style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)"></span></span></div>
+                <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f2f4"><label style="font-size:14px;color:#4b5563;text-align:right">端数処理</label><div style="height:28px;width:220px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;font-size:14px"><span>切捨（明細単位）</span><span style="color:#4b5563">⌄</span></div></div>
+                <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;padding:8px 0"><label style="font-size:14px;color:#4b5563;text-align:right">既定税率</label><div style="display:flex;padding:2px;border-radius:7px;background:#e8e8ed;gap:2px;width:fit-content"><span style="height:24px;padding:0 16px;display:inline-flex;align-items:center;border-radius:5px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.12);font-size:15px;font-weight:600">10%</span><span style="height:24px;padding:0 16px;display:inline-flex;align-items:center;border-radius:5px;font-size:14px;color:#374151">8%</span></div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:#4b5563;letter-spacing:.02em">書類番号 / 表示</span>
+              <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:6px 14px">
+                <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f2f4"><label style="font-size:14px;color:#4b5563;text-align:right">採番ルール</label><div style="display:flex;gap:8px"><div style="height:42px;flex:1;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px">EST-{0000}</div><div style="height:42px;flex:1;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px">CTR-{0000}</div><div style="height:42px;flex:1;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px">INV-{0000}</div></div></div>
+                <div style="display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;padding:8px 0"><label style="font-size:14px;color:#4b5563;text-align:right">外観</label><div style="display:flex;padding:2px;border-radius:7px;background:#e8e8ed;gap:2px;width:fit-content"><span style="height:24px;padding:0 14px;display:inline-flex;align-items:center;border-radius:5px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.12);font-size:15px;font-weight:600">ライト</span><span style="height:24px;padding:0 14px;display:inline-flex;align-items:center;border-radius:5px;font-size:14px;color:#374151">ダーク</span><span style="height:24px;padding:0 14px;display:inline-flex;align-items:center;border-radius:5px;font-size:14px;color:#374151">自動</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="padding:0 44px 52px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid #d1d5db">
+    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;color:#4b5563">GROUP F</span>
+    <span style="font-size:15px;font-weight:600">状態と共通パーツ</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+
+    <div id="sB" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#4b5563;color:#fff">状態</span>
+        <span style="font-size:15px;font-weight:600">ステータスバッジ ＋ 期限切れの重ね方</span>
+      </div>
+      <div style="width:620px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:16px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+        <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:600;color:#4b5563">見積書</span><div style="display:flex;gap:8px;flex-wrap:wrap"><dc-import name="Badge" label="下書き" tone="draft" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="送付済" tone="sent" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="承認済" tone="ok" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="却下" tone="danger" hint-size="56px,20px"></dc-import></div></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:600;color:#4b5563">契約書</span><div style="display:flex;gap:8px;flex-wrap:wrap"><dc-import name="Badge" label="下書き" tone="draft" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="送付済" tone="sent" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="締結済" tone="ok" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="キャンセル" tone="neutral" hint-size="80px,20px"></dc-import></div></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:600;color:#4b5563">請求書</span><div style="display:flex;gap:8px;flex-wrap:wrap"><dc-import name="Badge" label="下書き" tone="draft" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="送付済" tone="sent" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="入金済" tone="ok" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="キャンセル" tone="neutral" hint-size="80px,20px"></dc-import></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;padding-top:14px;border-top:1px solid #f0f0f2">
+          <span style="font-size:12px;font-weight:600;color:#4b5563">期限は日付から算出し、ステータスに重ねて表示（置き換えない）</span>
+          <div style="display:flex;align-items:center;gap:12px"><div style="display:flex;gap:6px"><dc-import name="Badge" label="送付済" tone="sent" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="期限切れ" tone="danger" outline="{{ true }}" hint-size="72px,20px"></dc-import></div><span style="font-size:12px;color:#4b5563">支払期限を過ぎた請求（枠線＝算出値）</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="display:flex;gap:6px"><dc-import name="Badge" label="送付済" tone="sent" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="あと2日" tone="warn" hint-size="64px,20px"></dc-import></div><span style="font-size:12px;color:#4b5563">期限3日前から警告</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="display:flex;gap:6px"><dc-import name="Badge" label="承認済" tone="ok" hint-size="64px,20px"></dc-import><dc-import name="Badge" label="有効期限切れ" tone="draft" outline="{{ true }}" hint-size="92px,20px"></dc-import></div><span style="font-size:12px;color:#4b5563">承認済の見積は期限切れでも警告色にしない</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><dc-import name="Badge" label="入金済" tone="ok" hint-size="64px,20px"></dc-import><span style="font-size:12px;color:#4b5563">入金済・キャンセルには期限バッジを出さない</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sE" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#4b5563;color:#fff">空状態</span>
+        <span style="font-size:15px;font-weight:600">顧客ゼロ / 案件ゼロ / 書類ゼロ</span>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="width:320px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+          <div style="width:112px;height:64px;border-radius:8px;border:1px dashed #d1d5db;background:repeating-linear-gradient(135deg,#f9fafb 0 6px,#f1f2f4 6px 12px)"></div>
+          <span style="font-size:16px;font-weight:600">顧客がまだありません</span>
+          <span style="font-size:12px;line-height:18px;color:#4b5563;text-align:center">最初の顧客を登録すると、見積書からの一連の流れが使えます。</span>
+          <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">顧客を追加</button>
+          <a href="#s12" style="font-size:12px">事業者情報を先に設定する</a>
+        </div>
+        <div style="width:320px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+          <div style="width:112px;height:64px;border-radius:8px;border:1px dashed #d1d5db;background:repeating-linear-gradient(135deg,#f9fafb 0 6px,#f1f2f4 6px 12px)"></div>
+          <span style="font-size:16px;font-weight:600">案件がありません</span>
+          <span style="font-size:12px;line-height:18px;color:#4b5563;text-align:center">案件をつくると、見積・契約・請求がタイムラインでつながります。</span>
+          <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">案件を作成</button>
+          <span style="font-size:12px;color:#4b5563">顧客 24件から選べます</span>
+        </div>
+        <div style="width:320px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+          <div style="width:112px;height:64px;border-radius:8px;border:1px dashed #d1d5db;background:repeating-linear-gradient(135deg,#f9fafb 0 6px,#f1f2f4 6px 12px)"></div>
+          <span style="font-size:16px;font-weight:600">該当する請求書がありません</span>
+          <span style="font-size:12px;line-height:18px;color:#4b5563;text-align:center">絞り込み「期限切れ」を外すと 19件が表示されます。</span>
+          <div style="display:flex;gap:8px"><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">絞り込み解除</button><button style="height:32px;padding:0 12px;border:none;border-radius:6px;background:#1d4ed8;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">請求書を作成</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sC" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#4b5563;color:#fff">共通</span>
+        <span style="font-size:15px;font-weight:600">共通パーツ</span>
+        <span style="font-size:12px;color:#4b5563">ボタン / 入力 / ダイアログ / 通知 / ロック / スマホナビ</span>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+        <div style="width:400px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+          <span style="font-size:12px;font-weight:600;color:#4b5563">ボタン（主/副/危険 ・ 通常/押下/無効）</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button style="height:38px;padding:0 16px;border:1px solid #1d4ed8;border-radius:8px;background:#2563eb;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#0069d9">主ボタン</button>
+            <button style="height:32px;padding:0 14px;border:none;border-radius:6px;background:#1d4ed8;color:#fff;font-family:inherit;font-size:14px;font-weight:500">押下</button>
+            <button style="height:32px;padding:0 14px;border:none;border-radius:6px;background:#e8e8ed;color:#9ca3af;font-family:inherit;font-size:14px;font-weight:500">無効</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button style="height:32px;padding:0 14px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-family:inherit;font-size:14px;color:#1f2937;cursor:pointer" style-hover="background:#f9fafb">副ボタン</button>
+            <button style="height:38px;padding:0 12px;border:none;border-radius:8px;background:transparent;font-family:inherit;font-size:14px;font-weight:500;color:#1d4ed8;cursor:pointer">テキスト</button>
+            <button style="height:38px;padding:0 16px;border:1px solid #fef2f2;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#b91c1c;cursor:pointer" style-hover="background:#fef2f2">削除</button>
+          </div>
+          <span style="font-size:12px;font-weight:600;color:#4b5563;padding-top:10px;border-top:1px solid #f0f0f2">入力</span>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-size:14px">テキスト入力</div>
+            <div style="height:42px;border:1px solid #3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.15);border-radius:8px;display:flex;align-items:center;padding:0 10px;font-size:14px">フォーカス</div>
+            <div style="height:42px;border:1px solid #d1d5db;background:#f1f2f4;border-radius:6px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#4b5563">編集不可（ロック）</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="height:42px;border:1px solid #ef4444;border-radius:8px;box-shadow:0 0 0 4px rgba(239,68,68,.15);display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:14px;color:#b91c1c">1,200,000</div>
+              <span style="font-size:12px;color:#b91c1c">契約残額を超えています（残額 ¥400,000）</span>
+            </div>
+            <div style="display:flex;gap:8px"><div style="flex:1;height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;font-size:14px"><span>セレクト</span><span style="color:#4b5563">⌄</span></div><div style="width:132px;height:42px;border:1px solid #d1d5db;border-radius:8px;background:#fff;display:flex;align-items:center;padding:0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px">2026-09-03</div></div>
+          </div>
+        </div>
+
+        <div style="width:400px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+            <span style="font-size:12px;font-weight:600;color:#4b5563">ダイアログ（危険操作の確認）</span>
+            <div style="border-radius:10px;background:#f9fafb;border:1px solid #d1d5db;box-shadow:0 12px 32px rgba(0,0,0,.16);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+              <span style="font-size:15px;font-weight:600">請求書 INV-0142 をキャンセルしますか？</span>
+              <span style="font-size:12px;line-height:17px;color:#4b5563">契約の請求済額から <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">¥220,000</span> が戻り、残額は <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">¥620,000</span> になります。送付済のため顧客への連絡は別途必要です。</span>
+              <div style="display:flex;gap:8px;padding-top:4px"><button style="height:38px;padding:0 16px;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:500;color:#1f2937;cursor:pointer">戻る</button><button style="height:38px;padding:0 16px;border:1px solid #dc2626;border-radius:8px;background:#dc2626;color:#fff;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer">キャンセルする</button></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+            <span style="font-size:12px;font-weight:600;color:#4b5563">通知（右上に一時表示）</span>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:rgba(250,250,252,.92);border:1px solid #d1d5db;box-shadow:0 10px 26px rgba(0,0,0,.14)"><span style="width:8px;height:8px;border-radius:999px;background:#10b981;flex:none"></span><span style="flex:1;font-size:12px">請求書 INV-0148 を送付しました</span><span style="font-size:12px;font-weight:500;color:#1d4ed8">取り消す</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:#fef2f2;border:1px solid #fef2f2"><span style="width:8px;height:8px;border-radius:999px;background:#dc2626;flex:none"></span><span style="flex:1;font-size:12px;color:#b91c1c">保存に失敗しました。通信を確認してください</span><span style="font-size:12px;font-weight:600;color:#b91c1c">再試行</span></div>
+          </div>
+          <div style="background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+            <span style="font-size:12px;font-weight:600;color:#4b5563">ロック表示（グレーアウトだけにしない）</span>
+            <div style="border-radius:8px;background:#f1f2f4;padding:12px;display:flex;gap:10px;align-items:flex-start">
+              <span style="width:16px;height:16px;border-radius:4px;background:#9ca3af;flex:none;margin-top:1px"></span>
+              <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:15px;font-weight:600">理由＋代わりの手段を必ず併記</span><span style="font-size:12px;line-height:17px;color:#4b5563">「契約に変換済みのため編集不可」＋「複製して新規作成」ボタン。ロック中の項目は背景 --color-muted、文字 --color-text-subtle。</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:300px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+          <span style="font-size:12px;font-weight:600;color:#4b5563">スマホのナビの畳み方</span>
+          <div style="border:1px solid #d1d5db;border-radius:10px;overflow:hidden">
+            <div style="height:44px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid #d1d5db;background:rgba(247,247,249,.94)"><span style="font-size:17px;color:#1d4ed8">‹</span><span style="flex:1;font-size:15px;font-weight:600;text-align:center">案件</span><span style="width:24px;height:24px;border-radius:999px;background:#e8e8ed"></span></div>
+            <div style="padding:8px;display:flex;flex-direction:column;gap:1px;background:#f9fafb">
+              <span style="height:32px;display:flex;align-items:center;padding:0 10px;border-radius:6px;background:#1d4ed8;color:#fff;font-size:15px;font-weight:600">ダッシュボード</span>
+              <span style="height:32px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">顧客</span>
+              <span style="height:32px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">案件</span>
+              <span style="height:32px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">書類</span>
+              <span style="height:32px;display:flex;align-items:center;padding:0 10px;font-size:14px;color:#374151">設定</span>
+            </div>
+            <div style="height:49px;border-top:1px solid #d1d5db;display:grid;grid-template-columns:repeat(4,1fr);align-items:center;text-align:center;font-size:10px;background:rgba(247,247,249,.94)"><span style="color:#1d4ed8;font-weight:600">ホーム</span><span style="color:#4b5563">顧客</span><span style="color:#4b5563">案件</span><span style="color:#4b5563">書類</span></div>
+          </div>
+          <span style="font-size:12px;line-height:18px;color:#4b5563">主要4つはタブバーに常設（44pt以上）。残りは設定内。作成は画面右上の＋。作成フォームは閲覧優先で、明細は1行=1カード（<a href="#s07m">07-sp</a>）。</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="padding:0 44px 96px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid #d1d5db">
+    <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:500;color:#4b5563">GROUP G</span>
+    <span style="font-size:15px;font-weight:600">デザイントークン</span>
+  </div>
+  <div id="s13" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;height:20px;padding:0 8px;display:inline-flex;align-items:center;border-radius:5px;background:#1f2937;color:#fff">13</span>
+      <span style="font-size:15px;font-weight:600">デザイントークン（CSS変数 / ライト・ダーク）</span>
+      <span style="font-size:12px;color:#4b5563">そのままコピー可</span>
+    </div>
+    <div style="width:1280px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:20px;box-shadow:0 8px 24px rgba(0,0,0,.06)">
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:15px;font-weight:600">色 — :root（light） / [data-theme="dark"]</span>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;border:1px solid #d1d5db;border-radius:12px;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px">
+          <div style="padding:7px 12px;background:#f9fafb;border-bottom:1px solid #d1d5db;font-weight:600;color:#4b5563">--変数名</div><div style="padding:7px 12px;background:#f9fafb;border-bottom:1px solid #d1d5db;font-weight:600;color:#4b5563">light</div><div style="padding:7px 12px;background:#f9fafb;border-bottom:1px solid #d1d5db;font-weight:600;color:#4b5563">dark</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-bg</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#f9fafb"></span>#f9fafb</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#171717"></span>#171717</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-surface</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#ffffff"></span>#ffffff</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#262626"></span>#262626</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-muted</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#f1f2f4"></span>#f1f2f4</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#404040"></span>#404040</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-sidebar-bg</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#f9fafb"></span>#f9fafb</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#262626"></span>#262626</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-divider</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#d1d5db"></span>#d1d5db</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#404040"></span>#404040</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-border</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#d1d5db"></span>#d1d5db</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#525252"></span>#525252</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-text</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#1f2937"></span>#1f2937</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#f9fafb"></span>#f9fafb</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-text-muted</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#4b5563"></span>#4b5563</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#a3a3a3"></span>#a3a3a3</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-text-subtle</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#4b5563"></span>#4b5563</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#737373"></span>#737373</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-accent</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#1d4ed8"></span>#1d4ed8</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#3b82f6"></span>#3b82f6</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-accent-hover</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #d1d5db;background:#1d4ed8"></span>#1d4ed8</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;border:1px solid #404040;background:#60a5fa"></span>#60a5fa</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-series-1 … 5</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border-radius:3px;background:#2563eb"></span><span style="width:14px;height:14px;border-radius:3px;background:#8b5cf6"></span><span style="width:14px;height:14px;border-radius:3px;background:#10b981"></span><span style="width:14px;height:14px;border-radius:3px;background:#38bdf8"></span><span style="width:14px;height:14px;border-radius:3px;background:#e5e7eb"></span></div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border-radius:3px;background:#60a5fa"></span><span style="width:14px;height:14px;border-radius:3px;background:#a78bfa"></span><span style="width:14px;height:14px;border-radius:3px;background:#34d399"></span><span style="width:14px;height:14px;border-radius:3px;background:#7dd3fc"></span><span style="width:14px;height:14px;border-radius:3px;background:#404040"></span></div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-status-draft-bg / -fg</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#f1f2f4"></span>#f1f2f4 / #4b5563</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#404040"></span>#404040 / #a3a3a3</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-status-sent-bg / -fg</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#eff6ff"></span>#eff6ff / #1d4ed8</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#1d4ed8"></span>#1d4ed8 / #eff6ff</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-status-ok-bg / -fg</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#ecfdf5"></span>#ecfdf5 / #047857</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#047857"></span>#047857 / #34d399</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-status-danger-bg / -fg</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#fef2f2"></span>#fef2f2 / #b91c1c</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#b91c1c"></span>#b91c1c / #fef2f2</div>
+          <div style="padding:6px 12px;border-bottom:1px solid #f1f2f4">--color-status-neutral-bg / -fg</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#f1f2f4"></span>#f1f2f4 / #4b5563</div><div style="padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#404040"></span>#404040 / #c4c7c5</div>
+          <div style="padding:6px 12px">--color-status-warn-bg / -fg</div><div style="padding:6px 12px;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#fffbeb"></span>#fffbeb / #b45309</div><div style="padding:6px 12px;color:#4b5563;display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border-radius:3px;background:#b45309"></span>#b45309 / #fbbf24</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:600">タイポグラフィ（system-ui / Tailwind スケール）</span>
+          <div style="border:1px solid #d1d5db;border-radius:12px;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px">
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:7px 12px;background:#f9fafb;border-bottom:1px solid #d1d5db;font-weight:600;color:#4b5563"><span>--変数名</span><span>値</span><span>行間 / 字間</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--font-sans</span><span style="grid-column:span 2">ui-sans-serif, system-ui, 'Noto Sans JP'</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--font-mono</span><span style="grid-column:span 2">ui-monospace, SFMono-Regular, Menlo</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-2xs</span><span>11px</span><span>16px / .06em（uppercase見出し）</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-xs</span><span>12px</span><span>16px / 0</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-sm</span><span>13px</span><span>18px / 0</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-base</span><span>14px</span><span>20px / 0</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-lg</span><span>15px / 600</span><span>22px / 0</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-xl</span><span>18px / 600</span><span>26px / -.01em</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-2xl</span><span>24px / 600</span><span>30px / -.02em</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--text-3xl</span><span>30px / 600</span><span>38px / -.02em</span></div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;padding:6px 12px;color:#4b5563"><span style="color:#1f2937">--text-hero</span><span>40px / 600</span><span>48px / -.02em（主要金額）</span></div>
+          </div>
+          <span style="font-size:12px;line-height:18px;color:#4b5563">金額は必ず --font-mono ＋ font-variant-numeric: tabular-nums ＋ 右揃え ＋ 3桁区切り。マイナスは先頭に「-」、色は --color-status-danger-fg。</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:600">余白 / 角丸 / 影 / 高さ</span>
+          <div style="border:1px solid #d1d5db;border-radius:12px;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px">
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:7px 12px;background:#f9fafb;border-bottom:1px solid #d1d5db;font-weight:600;color:#4b5563"><span>--変数名</span><span>値</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--space-1 … 8</span><span>2 / 4 / 6 / 8 / 12 / 16 / 20 / 24 px</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--radius-control</span><span>8px（rounded-lg：ボタン・入力）</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--radius-card / -window</span><span>12px / 12px（rounded-xl）</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--radius-segment / -pill</span><span>5px（内側） / 999px</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--shadow-window</span><span>0 8px 24px rgb(0 0 0 / .06)</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--shadow-dialog</span><span>0 12px 32px rgb(0 0 0 / .16)</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--shadow-notification</span><span>0 10px 26px rgb(0 0 0 / .14)</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--focus-ring</span><span>0 0 0 3px rgb(0 122 255 / .25)</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--control-h / --input-h</span><span>38px / 42px（スマホは44px）</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;border-bottom:1px solid #f1f2f4;color:#4b5563"><span style="color:#1f2937">--row-h / --row-h-header</span><span>48px / 40px</span></div>
+            <div style="display:grid;grid-template-columns:1.3fr 1.7fr;padding:6px 12px;color:#4b5563"><span style="color:#1f2937">--sidebar-w / --header-h</span><span>260px / 64px</span></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:60px;height:36px;border-radius:6px;background:#fff;border:1px solid #d1d5db"></div>
+            <div style="width:60px;height:36px;border-radius:8px;background:#fff;border:1px solid #d1d5db;box-shadow:0 8px 24px rgba(0,0,0,.06)"></div>
+            <div style="width:60px;height:36px;border-radius:10px;background:#fff;border:1px solid #d1d5db;box-shadow:0 12px 32px rgba(0,0,0,.16)"></div>
+            <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#4b5563">control / window / dialog</span>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin:0;font-size:12px;line-height:19px;color:#4b5563;max-width:920px">Preline UI / Tailwind のスケールに準拠（gray-*, blue-600, emerald, red, amber。枠線は gray-300 で明示的に）。ダークは neutral-800/900 系で同じ変数名を [data-theme="dark"] で上書き。彩度はステータスと警告のみで、ほかはシステムグレー。ステータス色は面（-bg）＋文字（-fg）の2値セット、日付から算出する状態（期限切れ・残日数）は面なし・枠線のみで区別する。</p>
+    </div>
+  </div>
+
+  <p style="margin:8px 0 0;font-size:14px;line-height:20px;color:#4b5563;max-width:800px">次にやれること: 「<a href="#s06">06</a> のタイムラインを横並びステップでも見たい」・「<a href="#s14">14</a> に部分入金の充当履歴を追加」・「全画面をダークで通す」・「明細のテンプレート（よく使う品目）管理画面」</p>
+</div>
+</x-dc>
+</body>
+</html>

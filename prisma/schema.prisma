@@ -57,6 +57,11 @@ model Organization {
   defaultTaxRate Int         @default(10)
   taxRounding    TaxRounding @default(FLOOR)
 
+  // 書類番号の採番形式(デザイン 画面12)。{0000} が連番に置き換わる
+  quoteNumberFormat    String @default("EST-{0000}")
+  contractNumberFormat String @default("CTR-{0000}")
+  invoiceNumberFormat  String @default("INV-{0000}")
+
   memberships Membership[]
   invitations Invitation[]
   sequences   DocumentSequence[]
@@ -166,7 +171,7 @@ model VerificationToken {
 // ─────────────────────────────
 // 伝票番号の採番
 // 作成と同一トランザクション内で
-//   INSERT ... ON CONFLICT (organizationId, kind, year) DO UPDATE SET last = "DocumentSequence".last + 1 RETURNING last
+//   INSERT ... ON CONFLICT (organizationId, kind, scope) DO UPDATE SET last = "DocumentSequence".last + 1 RETURNING last
 // を実行する。行ロックで直列化されるため同時採番でも重複しない。
 // ─────────────────────────────
 
@@ -179,12 +184,14 @@ enum DocumentKind {
 model DocumentSequence {
   organizationId String
   kind           DocumentKind
-  year           Int
+  // 連番のリセット単位。"ALL" は通し番号(デザインの EST-{0000} 形式が該当)。
+  // 年ごとにリセットしたくなった場合は "2026" のように年を入れる。
+  scope          String       @default("ALL")
   last           Int          @default(0)
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@id([organizationId, kind, year])
+  @@id([organizationId, kind, scope])
 }
 
 // ─────────────────────────────
@@ -201,6 +208,19 @@ model Customer {
   postalCode     String?
   address        String?
   notes          String?
+
+  // 顧客側の適格請求書発行事業者の登録番号(一覧に表示する。デザイン 画面03)
+  invoiceRegistrationNumber String?
+
+  // 請求条件(デザイン 画面04「末日締 翌月末払」など)
+  // closingDay / paymentDay は 1〜31。31 は月末として扱う。
+  // paymentMonthOffset は 0=当月 / 1=翌月 / 2=翌々月。
+  closingDay         Int?
+  paymentMonthOffset Int  @default(1)
+  paymentDay         Int?
+
+  // この顧客への請求で源泉徴収を既定でONにするか(請求書ごとに上書き可能)
+  withholdingDefault Boolean @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -288,7 +308,8 @@ model QuoteItem {
   name        String
   description String?
   quantity    Int     @default(1)
-  unitPrice   Int // 税抜単価
+  unit        String? // 単位(式 / 個 / 人日 / 時間 など)
+  unitPrice   Int     // 税抜単価。値引き行はマイナスで入力する(デザイン仕様)
   taxRate     Int     @default(10) // 10 または 8
   amount      Int     @default(0)  // トリガー算出(quantity * unitPrice)
   sortOrder   Int     @default(0)
@@ -350,7 +371,8 @@ model ContractItem {
   name              String
   description       String?
   quantity          Int     @default(1)
-  unitPrice         Int
+  unit              String? // 単位(式 / 個 / 人日 / 時間 など)
+  unitPrice         Int     // 税抜単価。値引き行はマイナス
   taxRate           Int     @default(10)
   amount            Int     @default(0) // トリガー算出
   sortOrder         Int     @default(0)
@@ -422,7 +444,8 @@ model InvoiceItem {
   name        String
   description String?
   quantity    Int     @default(1)
-  unitPrice   Int
+  unit        String? // 単位(式 / 個 / 人日 / 時間 など)
+  unitPrice   Int     // 税抜単価。値引き行はマイナス
   taxRate     Int     @default(10)
   amount      Int     @default(0) // トリガー算出
   sortOrder   Int     @default(0)
