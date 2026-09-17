@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --exclude tests/unit/tax-db.test.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:migrate": "prisma migrate dev",
@@ -17,18 +17,23 @@
     "db:studio": "prisma studio",
     "db:verify": "psql \"$DATABASE_URL\" -f tests/db/verify-constraints.sql",
     "db:reset": "prisma migrate reset --force",
-    "db:check": "tsx scripts/check-db.ts"
+    "db:check": "tsx scripts/check-db.ts",
+    "test:db": "vitest run tests/unit/tax-db.test.ts",
+    "pdf:sample": "tsx scripts/pdf-sample.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
+    "@fontsource/noto-sans-jp": "^5.3.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "@react-pdf/renderer": "^4.9.0",
     "next": "^16.3.5",
     "next-auth": "^5.0.0-beta.32",
     "pg": "^8.23.0",
+    "playwright-core": "^1.63.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "zod": "^4.6.5"

@@ -1,0 +1,99 @@
+{
+  "_comment": [
+    "消費税・源泉徴収の計算ケース。src/lib/tax.ts(UIプレビュー用)と",
+    "DBトリガー(docs/db-constraints.sql)の両方が、このファイルの同じ期待値に対して検証される。",
+    "TS側だけで期待値を手書きすると、同じ式から導いた値で同じ式を検証する循環になり、",
+    "DBとのずれを検出できない。期待値を足すときは必ずここに書く。",
+    "検証: npm test(TS) / npm run test:db(実DB。DATABASE_URL が必要)"
+  ],
+  "taxCases": [
+    {
+      "name": "10%のみ",
+      "rounding": "FLOOR",
+      "items": [{ "quantity": 2, "unitPrice": 500, "taxRate": 10 }],
+      "expected": { "subtotal10": 1000, "tax10": 100, "subtotal8": 0, "tax8": 0, "subtotal": 1000, "taxAmount": 100, "totalAmount": 1100 }
+    },
+    {
+      "name": "10%と8%の混在。8%対象999円の端数は書類単位で1回だけ丸める(行ごとなら78円になる)",
+      "rounding": "FLOOR",
+      "items": [
+        { "quantity": 2, "unitPrice": 500, "taxRate": 10 },
+        { "quantity": 1, "unitPrice": 333, "taxRate": 8 },
+        { "quantity": 1, "unitPrice": 333, "taxRate": 8 },
+        { "quantity": 1, "unitPrice": 333, "taxRate": 8 }
+      ],
+      "expected": { "subtotal10": 1000, "tax10": 100, "subtotal8": 999, "tax8": 79, "subtotal": 1999, "taxAmount": 179, "totalAmount": 2178 }
+    },
+    {
+      "name": "端数が0.5未満(8.08円)。FLOOR",
+      "rounding": "FLOOR",
+      "items": [{ "quantity": 1, "unitPrice": 101, "taxRate": 8 }],
+      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 101, "tax8": 8, "subtotal": 101, "taxAmount": 8, "totalAmount": 109 }
+    },
+    {
+      "name": "端数が0.5未満(8.08円)。ROUND は切り捨てと同じ",
+      "rounding": "ROUND",
+      "items": [{ "quantity": 1, "unitPrice": 101, "taxRate": 8 }],
+      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 101, "tax8": 8, "subtotal": 101, "taxAmount": 8, "totalAmount": 109 }
+    },
+    {
+      "name": "端数が0.5未満(8.08円)。CEIL は切り上げ",
+      "rounding": "CEIL",
+      "items": [{ "quantity": 1, "unitPrice": 101, "taxRate": 8 }],
+      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 101, "tax8": 9, "subtotal": 101, "taxAmount": 9, "totalAmount": 110 }
+    },
+    {
+      "name": "端数が0.5以上(8.56円)。ROUND は切り上がる",
+      "rounding": "ROUND",
+      "items": [{ "quantity": 1, "unitPrice": 107, "taxRate": 8 }],
+      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 107, "tax8": 9, "subtotal": 107, "taxAmount": 9, "totalAmount": 116 }
+    },
+    {
+      "name": "端数が0.5以上(8.56円)。FLOOR は切り捨てのまま",
+      "rounding": "FLOOR",
+      "items": [{ "quantity": 1, "unitPrice": 107, "taxRate": 8 }],
+      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 107, "tax8": 8, "subtotal": 107, "taxAmount": 8, "totalAmount": 115 }
+    },
+    {
+      "name": "値引き行(単価がマイナス)。同じ税率の課税対象から差し引く",
+      "rounding": "FLOOR",
+      "items": [
+        { "quantity": 1, "unitPrice": 100000, "taxRate": 10 },
+        { "quantity": 1, "unitPrice": -10000, "taxRate": 10 }
+      ],
+      "expected": { "subtotal10": 90000, "tax10": 9000, "subtotal8": 0, "tax8": 0, "subtotal": 90000, "taxAmount": 9000, "totalAmount": 99000 }
+    },
+    {
+      "name": "工数行(数量5・単価80,000)と値引きの混在",
+      "rounding": "FLOOR",
+      "items": [
+        { "quantity": 1, "unitPrice": 500000, "taxRate": 10 },
+        { "quantity": 5, "unitPrice": 80000, "taxRate": 10 },
+        { "quantity": 1, "unitPrice": -50000, "taxRate": 10 }
+      ],
+      "expected": { "subtotal10": 850000, "tax10": 85000, "subtotal8": 0, "tax8": 0, "subtotal": 850000, "taxAmount": 85000, "totalAmount": 935000 }
+    },
+    {
+      "name": "明細なし",
+      "rounding": "FLOOR",
+      "items": [],
+      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 0, "tax8": 0, "subtotal": 0, "taxAmount": 0, "totalAmount": 0 }
+    }
+  ],
+  "_withholdingComment": [
+    "源泉徴収税額。対象は税率をまたいだ税抜合計(DBは segrr_withholding_tax(NEW.subtotal))。",
+    "100万円以下は 10.21%、100万円超は超過分 20.42% + 102,100円。いずれも円未満切り捨て。"
+  ],
+  "withholdingCases": [
+    { "base": 0, "expected": 0 },
+    { "base": 1, "expected": 0 },
+    { "base": 10000, "expected": 1021 },
+    { "base": 99999, "expected": 10209 },
+    { "base": 999999, "expected": 102099 },
+    { "base": 1000000, "expected": 102100 },
+    { "base": 1000001, "expected": 102100 },
+    { "base": 1000050, "expected": 102110 },
+    { "base": 2000000, "expected": 306300 },
+    { "base": 12345678, "expected": 2418887 }
+  ]
+}

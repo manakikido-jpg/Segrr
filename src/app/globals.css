@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../styles/components.css";
 
 /* デザイントークンを Tailwind のユーティリティからも参照できるようにする。
  * 値の定義は src/styles/tokens.css が正で、ここでは名前の橋渡しだけを行う。 */

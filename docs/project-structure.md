@@ -14,6 +14,7 @@ segrr/
 │   ├── project-structure.md       # このファイル
 │   ├── phase0-task-breakdown.md   # タスク分解
 │   ├── PM-instructions-for-claude-code.md # モデル運用・査読の進め方
+│   ├── adr-001-pdf-rendering.md   # 帳票PDFの生成方式の決定と検証結果
 │   ├── design-brief.md            # デザイン依頼時のプロンプト
 │   ├── design-spec.md             # デザインの仕様まとめ(Claude Design 出力)
 │   └── db-constraints.sql         # 金額・消費税・テナント整合性のDB制約
@@ -64,18 +65,26 @@ segrr/
 │   │   │   ├── contract-service.ts
 │   │   │   └── invoice-service.ts   # 分割請求の合計金額チェックはここに集約
 │   │   └── validators/              # zodスキーマ(フォーム入力・API入出力の型検証)
+│   ├── assets/fonts/                # 帳票PDFに埋め込む Noto Sans JP(同梱必須)
 │   ├── styles/
-│   │   └── tokens.css               # デザイントークン(design/ のアートボード13が出典)
+│   │   ├── tokens.css               # デザイントークン(design/ のアートボード13が出典)
+│   │   └── components.css           # UIコンポーネントの構造スタイル(値はtokensから)
 │   ├── lib/
 │   │   ├── db.ts                    # Prisma Client シングルトン
 │   │   ├── auth.ts                  # NextAuth設定(Googleプロバイダ + 招待制チェック)
 │   │   ├── tax.ts                   # 消費税・源泉徴収の計算(UIプレビュー用。DBトリガーと同じ式)
-│   │   └── pdf.ts                   # PDF生成ユーティリティ
+│   │   ├── format.ts                # 金額・日付の表示(日付は必ず Asia/Tokyo)
+│   │   └── pdf/                     # 帳票PDF生成(ADR-001)
+│   │       ├── types.ts             # 帳票データ型(Prismaに依存しない)
+│   │       ├── template.ts          # 3書類共通のHTMLレイアウト
+│   │       └── render.ts            # HTML → PDF (headless Chromium)
 │   └── types/
 ├── tests/
 │   ├── unit/                        # server/services のロジックテスト(特に金額計算・バリデーション)
 │   ├── db/                          # db-constraints.sql の検証(実DBに対して実行。A2の完了条件)
 │   │   └── verify-constraints.sql
+│   ├── fixtures/
+│   │   └── tax-cases.json           # 税額の期待値。TS側とDB側の両方がこれを読む
 │   └── e2e/                         # 見積→契約→請求の一連フローのE2E
 └── .claude/
     └── commands/                    # Claude Code用カスタムコマンド(モデル切り替え等、後述)
