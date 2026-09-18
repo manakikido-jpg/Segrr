@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run --exclude tests/unit/tax-db.test.ts",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --exclude \"tests/unit/*-db.test.ts\" --exclude tests/unit/auth-invitation.test.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:migrate": "prisma migrate dev && prisma generate",
@@ -18,7 +18,7 @@
     "db:verify": "psql \"$DATABASE_URL\" -f tests/db/verify-constraints.sql",
     "db:reset": "prisma migrate reset --force",
     "db:check": "tsx scripts/check-db.ts",
-    "test:db": "vitest run tests/unit/tax-db.test.ts",
+    "test:db": "vitest run tests/unit/tax-db.test.ts tests/unit/auth-invitation.test.ts",
     "pdf:sample": "tsx scripts/pdf-sample.ts"
   },
   "prisma": {

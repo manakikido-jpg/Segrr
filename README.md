@@ -36,7 +36,39 @@ npm run dev              # http://localhost:3000
 | `AUTH_GOOGLE_ID` | Google OAuth クライアントID | Google Cloud Console → 認証情報 → OAuth 2.0 クライアント |
 | `AUTH_GOOGLE_SECRET` | 同シークレット | 同上 |
 
-Google OAuth の承認済みリダイレクトURIには `http://localhost:3000/api/auth/callback/google` を登録する。
+### Google OAuth の設定
+
+[Google Cloud Console](https://console.cloud.google.com/) →「Google Auth Platform」で行う。
+
+| 左メニュー | やること |
+|---|---|
+| ブランディング | アプリ名・サポートメール・デベロッパー連絡先 |
+| **対象** | User Type は「外部」。**テストユーザーに本人とテスターのメールアドレスを登録する** |
+| **クライアント** | 種類は「ウェブ アプリケーション」。承認済みリダイレクトURIに `http://localhost:3000/api/auth/callback/google` |
+| データアクセス | 触らなくてよい(email / profile / openid が既定で付く) |
+
+公開ステータスが「テスト」の間は、**テストユーザーに登録したアカウントしか Google を通過できない**。
+登録を忘れると、アプリ側の招待チェックに届く前に Google が弾く。
+
+リダイレクトURIは1文字でも違うとログインできない(末尾スラッシュなし)。
+
+### ログインの仕組み
+
+**Googleログイン + 招待制。** Google で認証が通っても、`Invitation` に無いメールアドレスは
+このアプリに入れない。判定は `src/server/auth/invitation.ts` に集約してあり、
+`tests/unit/auth-invitation.test.ts` で抜け道が無いことを実DBに対して固定している。
+
+- 招待は**入場券であって会員証ではない**。一度参加した人は `Membership` で判断するので、
+  招待の期限が切れても締め出されない
+- Google 側でメールアドレスが未確認のアカウントは拒否する
+- `Membership` はログイン時ではなく、組織を引くとき(`getActiveOrganization`)に遅延して作る。
+  Auth.js は `signIn` コールバックを `adapter.createUser` より前に呼ぶため、
+  コールバックの時点では User レコードが存在しない
+- **`organizationId` はセッションに持たせない。** 必ず `src/server/auth/session.ts` の
+  `requireOrganization()` からDB経由で得る。リクエストボディからは決して受け取らない
+
+テナント分離の確認には Google アカウントが3つ必要(本人・テスター・別組織用)。
+`+alias` は Google 側で同一アカウント扱いになるため使えない。
 
 ## スクリプト
 
