@@ -9,7 +9,7 @@ allowed-tools: Read, Glob, Grep
 
 ## 前提として読むもの
 
-- `docs/segrr-requirements-v1.md` — 要件定義書(このプロジェクトの正)
+- `docs/seggr-requirements-v1.md` — 要件定義書(このプロジェクトの正)
 - `docs/phase0-task-breakdown.md` — タスク分解
 - `docs/db-constraints.sql` — 金額・消費税・テナント整合性のDB制約
 - `docs/design-spec.md` — UIの仕様

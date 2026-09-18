@@ -1,12 +1,12 @@
--- Segrr: docs/db-constraints.sql のDBレベル検証
+-- Seggr: docs/db-constraints.sql のDBレベル検証
 --
 -- タスクA2の完了条件はこのスクリプトが全項目 PASS することで判定する。
 -- ユニットテストのモックでは検証できないため、必ず実DBに対して実行すること。
 --
 -- 実行方法:
---   createdb segrr_test
+--   createdb seggr_test
 --   npx prisma migrate deploy   # schema.prisma + db-constraints.sql のマイグレーション
---   psql -d segrr_test -f tests/db/verify-constraints.sql
+--   psql -d seggr_test -f tests/db/verify-constraints.sql
 --
 -- 期待結果: ✓ PASS が47件、✗ FAIL が0件。
 -- 空のDBに対して実行すること(テストデータを固定IDで投入するため)。

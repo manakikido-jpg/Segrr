@@ -1,16 +1,16 @@
-# Segrr プロジェクト構成案(Phase 0)
+# Seggr プロジェクト構成案(Phase 0)
 
 技術スタック: Next.js(App Router) + TypeScript + Prisma + PostgreSQL + NextAuth
 
 ```
-segrr/
+seggr/
 ├── README.md                      # セットアップ手順・環境変数一覧
 ├── design/                        # デザインキャンバス(Claude Design 出力)
-│   ├── segrr-ui.dc.html           # 全14アートボード
+│   ├── seggr-ui.dc.html           # 全14アートボード
 │   ├── Nav.dc.html / Badge.dc.html # 共有パーツ
 │   └── logo.png / support.js / uploads/
 ├── docs/
-│   ├── segrr-requirements-v1.md   # 要件定義書(このリポジトリの正)
+│   ├── seggr-requirements-v1.md   # 要件定義書(このリポジトリの正)
 │   ├── project-structure.md       # このファイル
 │   ├── phase0-task-breakdown.md   # タスク分解
 │   ├── PM-instructions-for-claude-code.md # モデル運用・査読の進め方

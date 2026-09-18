@@ -1,4 +1,4 @@
-# Segrr 要件定義書 v1.1(確定版)
+# Seggr 要件定義書 v1.1(確定版)
 
 作成日: 2026-09-02 / 最終更新: 2026-09-02(設計レビュー反映)
 フェーズ: 要件確定 → 設計フェーズへ
@@ -199,4 +199,4 @@ MVPの合格ライン(未達成。Phase 0の完了判定に使う):
 - `docs/phase0-task-breakdown.md` — Phase 0のタスク分解
 - `docs/project-structure.md` — ファイル構成
 - `docs/db-constraints.sql` — 金額・消費税・テナント整合性のDB制約
-- 本ドキュメントの前版: `segrr-requirements-v0.md`(未コミット)
+- 本ドキュメントの前版: `seggr-requirements-v0.md`(未コミット)

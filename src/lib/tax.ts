@@ -46,7 +46,7 @@ export type TaxBreakdown = {
 }
 
 /**
- * 明細1行の金額(税抜)。DBの segrr_set_item_amount() と同じ。
+ * 明細1行の金額(税抜)。DBの seggr_set_item_amount() と同じ。
  *
  * 数量が小数になりうるため、数量 × 単価 が小数になる場合はゼロ方向に切り捨てる
  * (例: 7.5時間 × 3,333円 = 24,997.5 → 24,997)。floor ではなく切り捨てなのは、
@@ -61,7 +61,7 @@ export function lineAmount(item: LineItemInput): number {
 }
 
 /**
- * 端数処理。PostgreSQL の segrr_round() と同じ挙動。
+ * 端数処理。PostgreSQL の seggr_round() と同じ挙動。
  * 引数は「税抜小計 × 税率」を分子、100 を分母とした分数として整数で渡す。
  */
 function applyRounding(numerator: number, mode: TaxRounding): number {
@@ -121,7 +121,7 @@ export function hasNegativeTaxableBase(breakdown: TaxBreakdown): boolean {
 }
 
 /**
- * 源泉徴収税額。DBの segrr_withholding_tax() と同じ。
+ * 源泉徴収税額。DBの seggr_withholding_tax() と同じ。
  *
  * 消費税を区分して記載しているため税抜額を対象にする。
  * 税抜額が100万円以下なら 10.21%、100万円を超える場合は超過分に 20.42% を掛けて

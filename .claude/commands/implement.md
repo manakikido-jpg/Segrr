@@ -11,7 +11,7 @@ $ARGUMENTS
 ## 着手前に読むもの
 
 - `docs/phase0-task-breakdown.md` — このタスクの完了条件
-- `docs/segrr-requirements-v1.md` — 要件定義書(正)
+- `docs/seggr-requirements-v1.md` — 要件定義書(正)
 - `docs/db-constraints.sql` — DBが保証している不変条件
 - `prisma/schema.prisma` — 冒頭のコメントに「アプリから書き込まないカラム」の一覧がある
 

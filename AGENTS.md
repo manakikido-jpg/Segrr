@@ -8,9 +8,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# Segrr プロジェクトのルール
+# Seggr プロジェクトのルール
 
-着手前に `docs/segrr-requirements-v1.md`(要件定義書・正)と
+着手前に `docs/seggr-requirements-v1.md`(要件定義書・正)と
 `docs/phase0-task-breakdown.md`(タスク分解)を読むこと。
 
 ## 金額まわり(最重要)

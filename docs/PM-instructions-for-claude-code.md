@@ -4,7 +4,7 @@
 
 ## 読む順番
 
-1. `docs/segrr-requirements-v1.md` — 要件定義書(このプロジェクトの正)
+1. `docs/seggr-requirements-v1.md` — 要件定義書(このプロジェクトの正)
 2. `docs/project-structure.md` — ファイル構成
 3. `docs/phase0-task-breakdown.md` — タスク分解(依存関係・工数付き)
 4. `docs/db-constraints.sql` — 金額・消費税・テナント整合性のDB制約(B4〜B6の前に必読)

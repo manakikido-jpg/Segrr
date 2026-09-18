@@ -338,7 +338,7 @@
     }
   ],
   "_withholdingComment": [
-    "源泉徴収税額。対象は税率をまたいだ税抜合計(DBは segrr_withholding_tax(NEW.subtotal))。",
+    "源泉徴収税額。対象は税率をまたいだ税抜合計(DBは seggr_withholding_tax(NEW.subtotal))。",
     "100万円以下は 10.21%、100万円超は超過分 20.42% + 102,100円。いずれも円未満切り捨て。"
   ],
   "withholdingCases": [

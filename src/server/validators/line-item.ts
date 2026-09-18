@@ -39,7 +39,7 @@ export const lineItemSchema = z.object({
 })
 
   .refine(
-    // DBの segrr_set_item_amount() が同じ検査をする。ここで弾かないと
+    // DBの seggr_set_item_amount() が同じ検査をする。ここで弾かないと
     // トリガーの例外がそのままユーザーに出る
     (item) => Math.abs(lineAmount(item)) <= MAX_LINE_AMOUNT,
     { message: '金額が大きすぎます。数量または単価を見直してください', path: ['unitPrice'] },

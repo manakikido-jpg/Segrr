@@ -1,11 +1,11 @@
-# Segrr
+# Seggr
 
 個人事業主・フリーランス向けの書類管理ツール。見積書 → 契約書 → 請求書を、
 データを再入力せずに引き継いで作成・管理する。顧客管理と案件の進捗管理を含む。
 
-- 要件定義書(このリポジトリの正): [`docs/segrr-requirements-v1.md`](docs/segrr-requirements-v1.md)
+- 要件定義書(このリポジトリの正): [`docs/seggr-requirements-v1.md`](docs/seggr-requirements-v1.md)
 - タスク分解: [`docs/phase0-task-breakdown.md`](docs/phase0-task-breakdown.md)
-- UIデザイン: [`docs/design-spec.md`](docs/design-spec.md) / キャンバスは `design/segrr-ui.dc.html`
+- UIデザイン: [`docs/design-spec.md`](docs/design-spec.md) / キャンバスは `design/seggr-ui.dc.html`
 
 ## 技術スタック
 
@@ -59,7 +59,7 @@ Windows のインストーラでは、コンポーネント選択で **PostgreSQ
 `psql` は使えてもサーバーが無く、接続が拒否される)。
 
 ```
-psql -U postgres -c "CREATE DATABASE segrr"
+psql -U postgres -c "CREATE DATABASE seggr"
 ```
 
 パスワードに `@ # / : ?` が含まれる場合は、`DATABASE_URL` の中で
@@ -135,9 +135,9 @@ TS側にも同じ計算式を置くが、それはUIプレビュー専用で、D
 `docs/db-constraints.sql` が実際に効いているかは、空のDBに対して検証スクリプトを流して確認する。
 
 ```bash
-createdb segrr_test
-DATABASE_URL="postgresql://.../segrr_test" npx prisma migrate deploy
-psql "postgresql://.../segrr_test" -f tests/db/verify-constraints.sql
+createdb seggr_test
+DATABASE_URL="postgresql://.../seggr_test" npx prisma migrate deploy
+psql "postgresql://.../seggr_test" -f tests/db/verify-constraints.sql
 ```
 
 47項目すべてが `✓ PASS` になること。これがタスクA2の完了条件。

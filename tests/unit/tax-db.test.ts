@@ -84,7 +84,7 @@ suite('DBトリガーとの一致', () => {
     it(`DBの源泉徴収も一致: 税抜 ${c.base.toLocaleString('ja-JP')}円`, async () => {
       const rows = await db.$queryRaw<
         { v: number }[]
-      >`SELECT segrr_withholding_tax(${c.base}::integer) AS v`
+      >`SELECT seggr_withholding_tax(${c.base}::integer) AS v`
       expect(rows[0]?.v).toBe(c.expected)
     })
   }

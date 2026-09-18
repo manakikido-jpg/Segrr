@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Segrr',
+  title: 'Seggr',
   description: '個人事業主のための書類管理ツール',
 }
 

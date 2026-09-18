@@ -15,7 +15,7 @@ const MESSAGES: Record<string, Message> = {
   'not-invited': {
     title: 'このアカウントは招待されていません',
     body:
-      'Segrr は招待されたメールアドレスでのみ利用できます。別のGoogleアカウントでログインするか、招待した本人にご確認ください。',
+      'Seggr は招待されたメールアドレスでのみ利用できます。別のGoogleアカウントでログインするか、招待した本人にご確認ください。',
   },
   'invitation-expired': {
     title: '招待の有効期限が切れています',
@@ -91,7 +91,7 @@ export default async function LoginPage({
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          <h1 style={{ margin: 0, fontSize: 'var(--text-2xl)', fontWeight: 600 }}>Segrr</h1>
+          <h1 style={{ margin: 0, fontSize: 'var(--text-2xl)', fontWeight: 600 }}>Seggr</h1>
           <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
             見積・契約・請求を1つにまとめる書類管理ツール
           </p>

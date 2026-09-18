@@ -1,4 +1,4 @@
--- Segrr: Prisma標準マイグレーション適用後に追加で流すSQL
+-- Seggr: Prisma標準マイグレーション適用後に追加で流すSQL
 -- 対象: 金額・消費税・テナント整合性をDBレベルで担保する
 -- 適用方法: `prisma migrate dev --create-only` で空のマイグレーションを作り、
 --           その migration.sql に本ファイルの内容を貼って `prisma migrate dev` で適用する。
@@ -53,7 +53,7 @@ ALTER TABLE "Organization"
 -- 値引き行(単価がマイナス)で floor すると値引き額が勝手に1円増えるため。
 --   例: 7.5時間 × 3,333円 = 24,997.5 → 24,997
 --       値引き -24,997.5 → -24,997(floor なら -24,998 になってしまう)
-CREATE OR REPLACE FUNCTION segrr_set_item_amount() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_set_item_amount() RETURNS TRIGGER AS $$
 DECLARE
   raw NUMERIC;
 BEGIN
@@ -70,17 +70,17 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_quote_item_amount ON "QuoteItem";
 CREATE TRIGGER trg_quote_item_amount
   BEFORE INSERT OR UPDATE ON "QuoteItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_set_item_amount();
+  FOR EACH ROW EXECUTE FUNCTION seggr_set_item_amount();
 
 DROP TRIGGER IF EXISTS trg_contract_item_amount ON "ContractItem";
 CREATE TRIGGER trg_contract_item_amount
   BEFORE INSERT OR UPDATE ON "ContractItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_set_item_amount();
+  FOR EACH ROW EXECUTE FUNCTION seggr_set_item_amount();
 
 DROP TRIGGER IF EXISTS trg_invoice_item_amount ON "InvoiceItem";
 CREATE TRIGGER trg_invoice_item_amount
   BEFORE INSERT OR UPDATE ON "InvoiceItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_set_item_amount();
+  FOR EACH ROW EXECUTE FUNCTION seggr_set_item_amount();
 
 -- ─────────────────────────────
 -- 2. 端数処理ヘルパ
@@ -88,7 +88,7 @@ CREATE TRIGGER trg_invoice_item_amount
 -- 適格請求書では端数処理は「1書類につき、税率ごとに1回」。
 -- 明細行ごとに丸めると税額がずれるため、必ず税率別の小計に対して1回だけ適用する。
 
-CREATE OR REPLACE FUNCTION segrr_round(v NUMERIC, mode "TaxRounding")
+CREATE OR REPLACE FUNCTION seggr_round(v NUMERIC, mode "TaxRounding")
 RETURNS INTEGER AS $$
 BEGIN
   RETURN (CASE mode
@@ -103,7 +103,7 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 --   税抜額 <= 1,000,000 : 税抜額 * 10.21%
 --   税抜額 >  1,000,000 : (税抜額 - 1,000,000) * 20.42% + 102,100
 -- いずれも円未満切り捨て。
-CREATE OR REPLACE FUNCTION segrr_withholding_tax(base INTEGER)
+CREATE OR REPLACE FUNCTION seggr_withholding_tax(base INTEGER)
 RETURNS INTEGER AS $$
 BEGIN
   IF base IS NULL OR base <= 0 THEN
@@ -123,7 +123,7 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 -- 契約超過チェックを素通りできてしまう。合計は必ずDB側で明細から導出する。
 -- (親が既に削除されている場合=カスケード削除時は、ルックアップがNULLになるので何もしない)
 
-CREATE OR REPLACE FUNCTION segrr_recalc_quote_totals() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_recalc_quote_totals() RETURNS TRIGGER AS $$
 DECLARE
   target_id TEXT := CASE TG_OP WHEN 'DELETE' THEN OLD."quoteId" ELSE NEW."quoteId" END;
   mode "TaxRounding";
@@ -146,8 +146,8 @@ BEGIN
       s10, s8, target_id;
   END IF;
 
-  t10 := segrr_round(s10 * 0.10, mode);
-  t8  := segrr_round(s8  * 0.08, mode);
+  t10 := seggr_round(s10 * 0.10, mode);
+  t8  := seggr_round(s8  * 0.08, mode);
 
   UPDATE "Quote" SET
       "updatedAt"   = now(),
@@ -164,9 +164,9 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_quote_recalc ON "QuoteItem";
 CREATE TRIGGER trg_quote_recalc
   AFTER INSERT OR UPDATE OR DELETE ON "QuoteItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_recalc_quote_totals();
+  FOR EACH ROW EXECUTE FUNCTION seggr_recalc_quote_totals();
 
-CREATE OR REPLACE FUNCTION segrr_recalc_contract_totals() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_recalc_contract_totals() RETURNS TRIGGER AS $$
 DECLARE
   target_id TEXT := CASE TG_OP WHEN 'DELETE' THEN OLD."contractId" ELSE NEW."contractId" END;
   mode "TaxRounding";
@@ -189,8 +189,8 @@ BEGIN
       s10, s8, target_id;
   END IF;
 
-  t10 := segrr_round(s10 * 0.10, mode);
-  t8  := segrr_round(s8  * 0.08, mode);
+  t10 := seggr_round(s10 * 0.10, mode);
+  t8  := seggr_round(s8  * 0.08, mode);
 
   UPDATE "Contract" SET
       "updatedAt"   = now(),
@@ -207,9 +207,9 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_contract_recalc ON "ContractItem";
 CREATE TRIGGER trg_contract_recalc
   AFTER INSERT OR UPDATE OR DELETE ON "ContractItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_recalc_contract_totals();
+  FOR EACH ROW EXECUTE FUNCTION seggr_recalc_contract_totals();
 
-CREATE OR REPLACE FUNCTION segrr_recalc_invoice_totals() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_recalc_invoice_totals() RETURNS TRIGGER AS $$
 DECLARE
   target_id TEXT := CASE TG_OP WHEN 'DELETE' THEN OLD."invoiceId" ELSE NEW."invoiceId" END;
   mode "TaxRounding";
@@ -231,8 +231,8 @@ BEGIN
       s10, s8, target_id;
   END IF;
 
-  t10 := segrr_round(s10 * 0.10, mode);
-  t8  := segrr_round(s8  * 0.08, mode);
+  t10 := seggr_round(s10 * 0.10, mode);
+  t8  := seggr_round(s8  * 0.08, mode);
 
   -- この UPDATE が Invoice 側の BEFORE UPDATE トリガー(源泉徴収の再計算と
   -- 契約超過チェック)を発火させる。防御線はここで閉じる。
@@ -251,7 +251,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_invoice_recalc ON "InvoiceItem";
 CREATE TRIGGER trg_invoice_recalc
   AFTER INSERT OR UPDATE OR DELETE ON "InvoiceItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_recalc_invoice_totals();
+  FOR EACH ROW EXECUTE FUNCTION seggr_recalc_invoice_totals();
 
 -- ─────────────────────────────
 -- 4. 請求書: 源泉徴収の算出 + テナント整合性 + 「請求済み合計 ≦ 契約金額」
@@ -259,7 +259,7 @@ CREATE TRIGGER trg_invoice_recalc
 -- 比較は税抜(subtotal)で行う。税込で比較すると、分割請求のたびに税率別の端数処理が
 -- 走るため、請求書の税込合計と契約の税込合計が数円ずれて誤判定する。
 
-CREATE OR REPLACE FUNCTION segrr_check_invoice() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_check_invoice() RETURNS TRIGGER AS $$
 DECLARE
   contract_subtotal INTEGER;
   contract_org      TEXT;
@@ -268,7 +268,7 @@ DECLARE
 BEGIN
   -- 源泉徴収の算出(対象外なら0)
   IF NEW."withholdingApplied" THEN
-    NEW."withholdingTax" := segrr_withholding_tax(NEW."subtotal");
+    NEW."withholdingTax" := seggr_withholding_tax(NEW."subtotal");
   ELSE
     NEW."withholdingTax" := 0;
   END IF;
@@ -320,14 +320,14 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_check_invoice ON "Invoice";
 CREATE TRIGGER trg_check_invoice
   BEFORE INSERT OR UPDATE ON "Invoice"
-  FOR EACH ROW EXECUTE FUNCTION segrr_check_invoice();
+  FOR EACH ROW EXECUTE FUNCTION seggr_check_invoice();
 
 -- ─────────────────────────────
 -- 5. 契約金額の減額を検査する
 -- ─────────────────────────────
 -- Invoice 側だけを守っても、請求書発行後に契約金額を下げれば超過状態を作れてしまう。
 
-CREATE OR REPLACE FUNCTION segrr_check_contract_decrease() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_check_contract_decrease() RETURNS TRIGGER AS $$
 DECLARE
   invoiced_subtotal INTEGER;
 BEGIN
@@ -352,7 +352,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_check_contract_decrease ON "Contract";
 CREATE TRIGGER trg_check_contract_decrease
   BEFORE UPDATE ON "Contract"
-  FOR EACH ROW EXECUTE FUNCTION segrr_check_contract_decrease();
+  FOR EACH ROW EXECUTE FUNCTION seggr_check_contract_decrease();
 
 -- ─────────────────────────────
 -- 6. 変換後の元書類を固定する(データ継承の前提)
@@ -360,7 +360,7 @@ CREATE TRIGGER trg_check_contract_decrease
 -- 見積の明細をコピーして契約を作る方式のため、元の見積を後から編集できると
 -- 「PDFに出した見積」と「DB上の見積」が食い違う。契約に変換された時点で凍結する。
 
-CREATE OR REPLACE FUNCTION segrr_guard_quote_items() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_guard_quote_items() RETURNS TRIGGER AS $$
 DECLARE
   target_id TEXT := CASE TG_OP WHEN 'DELETE' THEN OLD."quoteId" ELSE NEW."quoteId" END;
   quote_status "QuoteStatus";
@@ -385,9 +385,9 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_guard_quote_items ON "QuoteItem";
 CREATE TRIGGER trg_guard_quote_items
   BEFORE INSERT OR UPDATE OR DELETE ON "QuoteItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_guard_quote_items();
+  FOR EACH ROW EXECUTE FUNCTION seggr_guard_quote_items();
 
-CREATE OR REPLACE FUNCTION segrr_guard_contract_items() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_guard_contract_items() RETURNS TRIGGER AS $$
 DECLARE
   target_id TEXT := CASE TG_OP WHEN 'DELETE' THEN OLD."contractId" ELSE NEW."contractId" END;
   contract_status "ContractStatus";
@@ -412,14 +412,14 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_guard_contract_items ON "ContractItem";
 CREATE TRIGGER trg_guard_contract_items
   BEFORE INSERT OR UPDATE OR DELETE ON "ContractItem"
-  FOR EACH ROW EXECUTE FUNCTION segrr_guard_contract_items();
+  FOR EACH ROW EXECUTE FUNCTION seggr_guard_contract_items();
 
 -- ─────────────────────────────
 -- 7. 書類の物理削除を DRAFT に限定する
 -- ─────────────────────────────
 -- 送付済み・発行済みの書類は監査の観点から削除せず CANCELLED で残す。
 
-CREATE OR REPLACE FUNCTION segrr_guard_document_delete() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_guard_document_delete() RETURNS TRIGGER AS $$
 BEGIN
   IF OLD."status"::TEXT <> 'DRAFT' THEN
     RAISE EXCEPTION
@@ -433,7 +433,7 @@ $$ LANGUAGE plpgsql;
 -- Contract.sourceQuoteId には onDelete: Restrict を指定してあるが、参照アクションの
 -- 指定漏れ(Prismaのオプショナルリレーションは既定が SetNull)で継承元が黙って
 -- 失われる事故を防ぐため、DB側にも独立した防御を置く。
-CREATE OR REPLACE FUNCTION segrr_guard_quote_delete() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION seggr_guard_quote_delete() RETURNS TRIGGER AS $$
 DECLARE
   contract_count INTEGER;
 BEGIN
@@ -455,15 +455,15 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trg_guard_quote_delete ON "Quote";
 CREATE TRIGGER trg_guard_quote_delete
-  BEFORE DELETE ON "Quote" FOR EACH ROW EXECUTE FUNCTION segrr_guard_quote_delete();
+  BEFORE DELETE ON "Quote" FOR EACH ROW EXECUTE FUNCTION seggr_guard_quote_delete();
 
 DROP TRIGGER IF EXISTS trg_guard_contract_delete ON "Contract";
 CREATE TRIGGER trg_guard_contract_delete
-  BEFORE DELETE ON "Contract" FOR EACH ROW EXECUTE FUNCTION segrr_guard_document_delete();
+  BEFORE DELETE ON "Contract" FOR EACH ROW EXECUTE FUNCTION seggr_guard_document_delete();
 
 DROP TRIGGER IF EXISTS trg_guard_invoice_delete ON "Invoice";
 CREATE TRIGGER trg_guard_invoice_delete
-  BEFORE DELETE ON "Invoice" FOR EACH ROW EXECUTE FUNCTION segrr_guard_document_delete();
+  BEFORE DELETE ON "Invoice" FOR EACH ROW EXECUTE FUNCTION seggr_guard_document_delete();
 
 -- ─────────────────────────────
 -- 注意点
