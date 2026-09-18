@@ -1,4 +1,4 @@
-import { formatDate, formatYen } from '@/lib/format'
+import { formatDate, formatQuantity, formatYen } from '@/lib/format'
 import type { PdfDocumentData, PdfDocumentKind } from './types'
 
 /** 表題と日付ラベルだけが書類ごとに違う。レイアウト本体は共通。 */
@@ -62,7 +62,7 @@ function itemRows(data: PdfDocumentData): string {
     .map(
       (it) => `<tr>
   <td>${escapeHtml(it.name)}${it.description ? `<div class="item__desc">${nl2br(it.description)}</div>` : ''}</td>
-  <td class="num">${it.quantity.toLocaleString('ja-JP')}</td>
+  <td class="num">${formatQuantity(it.quantity)}</td>
   <td class="center">${escapeHtml(it.unit ?? '')}</td>
   <td class="num${it.unitPrice < 0 ? ' negative' : ''}">${formatYen(it.unitPrice)}</td>
   <td class="center">${it.taxRate}%</td>

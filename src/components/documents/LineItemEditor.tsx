@@ -93,8 +93,8 @@ export function LineItemEditor({ items, onChange, disabled }: Props) {
             <NumberInput
               aria-label={`${index + 1}行目の数量`}
               value={item.quantity}
-              min={1}
-              step={1}
+              min={0.25}
+              step={0.25}
               disabled={disabled}
               invalid={Boolean(errors.quantity)}
               onChange={(e) => update(index, { quantity: Number(e.target.value) })}

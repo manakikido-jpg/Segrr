@@ -18,11 +18,17 @@ export type TaxRate = 10 | 8
 export type TaxRounding = 'FLOOR' | 'ROUND' | 'CEIL'
 
 export type LineItemInput = {
+  /** 数量。小数第2位まで(0.5人日 / 7.5時間 / 0.25時間 など) */
   quantity: number
   /** 税抜単価。値引き行はマイナス */
   unitPrice: number
   taxRate: TaxRate
 }
+
+/** 明細1行の金額の上限。DBの INTEGER に収まる範囲に合わせてある。 */
+export const MAX_LINE_AMOUNT = 2_000_000_000
+/** 数量の上限。数量 × 単価 が INTEGER を超えないようにするため。 */
+export const MAX_QUANTITY = 100_000
 
 export type TaxBreakdown = {
   /** 10%対象の税抜小計 */
@@ -39,9 +45,19 @@ export type TaxBreakdown = {
   totalAmount: number
 }
 
-/** 明細1行の金額(税抜)。DBの segrr_set_item_amount() と同じ。 */
+/**
+ * 明細1行の金額(税抜)。DBの segrr_set_item_amount() と同じ。
+ *
+ * 数量が小数になりうるため、数量 × 単価 が小数になる場合はゼロ方向に切り捨てる
+ * (例: 7.5時間 × 3,333円 = 24,997.5 → 24,997)。floor ではなく切り捨てなのは、
+ * 値引き行(単価がマイナス)で floor すると値引き額が勝手に1円増えるため。
+ *
+ * 数量を100倍した整数で計算するのは浮動小数点の誤差を避けるため。
+ * `1.15 * 100` は 114.99999999999999 になるので、そのまま切り捨てると1円ずれる。
+ */
 export function lineAmount(item: LineItemInput): number {
-  return item.quantity * item.unitPrice
+  const hundredths = Math.round(item.quantity * 100)
+  return Math.trunc((hundredths * item.unitPrice) / 100)
 }
 
 /**

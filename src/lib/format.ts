@@ -20,6 +20,11 @@ export function formatYen(value: number): string {
   return value < 0 ? `-¥${formatNumber(Math.abs(value))}` : `¥${formatNumber(value)}`
 }
 
+/** 数量。末尾の 0 は落とす(5 → 「5」、0.50 → 「0.5」、7.50 → 「7.5」)。 */
+export function formatQuantity(value: number): string {
+  return Number(value.toFixed(2)).toLocaleString('ja-JP', { maximumFractionDigits: 2 })
+}
+
 function toDate(value: Date | string | null | undefined): Date | null {
   if (!value) return null
   const d = typeof value === 'string' ? new Date(value) : value

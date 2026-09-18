@@ -46,7 +46,7 @@ Google OAuth の承認済みリダイレクトURIには `http://localhost:3000/a
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm test` | Vitest(ユニットテスト) |
 | `npm run test:e2e` | Playwright |
-| `npm run db:migrate` | マイグレーション作成・適用(開発) |
+| `npm run db:migrate` | マイグレーション作成・適用 + Prisma Client 再生成(開発) |
 | `npm run db:deploy` | マイグレーション適用のみ(本番) |
 | `npm run db:check` | DB接続・トリガー算出の疎通確認 |
 | `npm run db:verify` | DB制約の検証(下記) |
@@ -60,6 +60,8 @@ Google OAuth の承認済みリダイレクトURIには `http://localhost:3000/a
 書き込んではいけない(対象カラムの一覧は `prisma/schema.prisma` 冒頭のコメント)。
 
 - 明細の単価は**税抜**で入力する。値引きは単価をマイナスにした明細行で表現する
+- 数量は小数(`Decimal(10,2)`)。半日単位・時間単位の請求に対応する。
+  `数量 × 単価` が小数になる場合はゼロ方向に切り捨てる
 - 消費税の端数処理は**1書類につき税率ごとに1回**(適格請求書の要件)。明細行ごとには丸めない
 - 分割請求の超過チェックは**税抜**で比較する(税込だと端数で誤判定する)
 - 源泉徴収は税抜額が対象。100万円以下は 10.21%、超過分は 20.42% + 102,100円
@@ -77,7 +79,7 @@ DATABASE_URL="postgresql://.../segrr_test" npx prisma migrate deploy
 psql "postgresql://.../segrr_test" -f tests/db/verify-constraints.sql
 ```
 
-39項目すべてが `✓ PASS` になること。これがタスクA2の完了条件。
+47項目すべてが `✓ PASS` になること。これがタスクA2の完了条件。
 
 ## 開発の進め方
 

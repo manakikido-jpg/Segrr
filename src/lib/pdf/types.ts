@@ -13,6 +13,7 @@ export type PdfDocumentKind = 'quote' | 'contract' | 'invoice'
 export type PdfLineItem = {
   name: string
   description?: string | null
+  /** 数量。小数第2位まで(0.5人日 / 7.5時間 など) */
   quantity: number
   unit?: string | null
   unitPrice: number

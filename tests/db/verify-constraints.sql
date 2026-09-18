@@ -8,7 +8,7 @@
 --   npx prisma migrate deploy   # schema.prisma + db-constraints.sql のマイグレーション
 --   psql -d segrr_test -f tests/db/verify-constraints.sql
 --
--- 期待結果: ✓ PASS が39件、✗ FAIL が0件。
+-- 期待結果: ✓ PASS が47件、✗ FAIL が0件。
 -- 空のDBに対して実行すること(テストデータを固定IDで投入するため)。
 
 -- 最初のエラーで止める。これがないと土台のINSERTが失敗した後も走り続け、
@@ -158,12 +158,33 @@ DO $$ BEGIN
   PERFORM t_eq('⑪ 工数行の amount (5人日 x 80000)', (SELECT amount FROM "QuoteItem" WHERE id='qd3'), 400000);
 END $$;
 
+-- ── 小数の数量(半日単位・時間単位の請求) ──
+INSERT INTO "Quote"(id,"organizationId","projectId",number) VALUES ('qt4','org1','prj3','EST-0004');
+INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,unit,"unitPrice","taxRate") VALUES
+  ('qf1','qt4','設計(半日)',0.5,'人日',80000,10),
+  ('qf2','qt4','実装(時間精算)',7.5,'時間',3333,10),
+  ('qf3','qt4','打ち合わせ',0.25,'時間',3333,10);
+DO $$ BEGIN
+  PERFORM t_eq('⑫ 0.5人日 x 80,000円', (SELECT amount FROM "QuoteItem" WHERE id='qf1'), 40000);
+  -- 24,997.5 をゼロ方向に切り捨て
+  PERFORM t_eq('⑫ 7.5時間 x 3,333円 = 24,997.5 → 切り捨て', (SELECT amount FROM "QuoteItem" WHERE id='qf2'), 24997);
+  PERFORM t_eq('⑫ 0.25時間 x 3,333円 = 833.25 → 切り捨て', (SELECT amount FROM "QuoteItem" WHERE id='qf3'), 833);
+  PERFORM t_eq('⑫ 小数を含む税抜合計', (SELECT subtotal FROM "Quote" WHERE id='qt4'), 65830);
+  PERFORM t_ok('⑫ 小数の値引き行はゼロ方向に切り捨て(-24,997.5 → -24,997)',
+    $q$INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,"unitPrice") VALUES('qf4','qt4','値引き',7.5,-3333)$q$);
+  PERFORM t_eq('⑫ 値引き行の amount(floor なら -24,998 になる)',
+    (SELECT amount FROM "QuoteItem" WHERE id='qf4'), -24997);
+  PERFORM t_fail('⑫ 数量0', $q$INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,"unitPrice") VALUES('qfX','qt4','x',0,1)$q$);
+  PERFORM t_fail('⑫ 数量が上限超え', $q$INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,"unitPrice") VALUES('qfY','qt4','x',100001,1)$q$);
+  PERFORM t_fail('⑫ 金額が INTEGER の範囲を超える',
+    $q$INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,"unitPrice") VALUES('qfZ','qt4','x',100000,1000000000)$q$);
+END $$;
+
 -- ── 入力値チェックとカスケード削除 ──
 INSERT INTO "Quote"(id,"organizationId","projectId",number) VALUES ('qt2','org1','prj1','Q-2026-0002');
 INSERT INTO "QuoteItem"(id,"quoteId",name,"unitPrice") VALUES ('qi9','qt2','下書き明細',100);
 DO $$ BEGIN
   PERFORM t_fail('⑨ 税率5%の明細',      $q$INSERT INTO "QuoteItem"(id,"quoteId",name,"unitPrice","taxRate") VALUES('qiY','qt2','x',1,5)$q$);
-  PERFORM t_fail('⑨ 数量0の明細',        $q$INSERT INTO "QuoteItem"(id,"quoteId",name,quantity,"unitPrice") VALUES('qiZ','qt2','x',0,1)$q$);
   PERFORM t_fail('⑨ 不正な登録番号',      $q$UPDATE "Organization" SET "invoiceRegistrationNumber"='12345' WHERE id='org1'$q$);
   PERFORM t_ok('⑨ 正しい登録番号',        $q$UPDATE "Organization" SET "invoiceRegistrationNumber"='T1234567890123' WHERE id='org1'$q$);
   PERFORM t_ok('⑩ 下書き見積は明細ごと削除できる(カスケード)', $q$DELETE FROM "Quote" WHERE id='qt2'$q$);

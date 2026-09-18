@@ -43,6 +43,9 @@ const baseItems = [
     quantity: 1, unit: '式', unitPrice: 500_000, taxRate: 10 as const,
   },
   { name: '追加実装(工数精算)', quantity: 5, unit: '人日', unitPrice: 80_000, taxRate: 10 as const },
+  // 半日単位・時間単位。7.5 × 3,333 = 24,997.5 はゼロ方向に切り捨てて 24,997 になる
+  { name: '要件定義ミーティング', quantity: 0.5, unit: '人日', unitPrice: 80_000, taxRate: 10 as const },
+  { name: '軽微な修正対応(時間精算)', quantity: 7.5, unit: '時間', unitPrice: 3_333, taxRate: 10 as const },
   { name: '説明用の小冊子制作(軽減税率対象)', quantity: 3, unit: '部', unitPrice: 333, taxRate: 8 as const },
   { name: '継続契約割引', quantity: 1, unit: '式', unitPrice: -50_000, taxRate: 10 as const },
 ]

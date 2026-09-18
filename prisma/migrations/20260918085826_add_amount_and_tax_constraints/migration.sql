@@ -22,19 +22,20 @@
 -- 単価のマイナスを許すのは値引き行のため(デザイン仕様: 値引きは単価をマイナスで入力し、
 -- 同じ税率の課税対象から差し引く)。ただし税率別の小計がマイナスになると消費税額も
 -- マイナスになって意味をなさないため、小計側をセクション3で検査する。
+-- 数量の上限(100,000)は、数量 × 単価 が INTEGER の範囲(約21.4億)を超えないようにするため。
 
 ALTER TABLE "QuoteItem"
-  ADD CONSTRAINT "QuoteItem_quantity_positive"  CHECK ("quantity" > 0),
+  ADD CONSTRAINT "QuoteItem_quantity_positive"  CHECK ("quantity" > 0 AND "quantity" <= 100000),
   ADD CONSTRAINT "QuoteItem_unitPrice_range"    CHECK ("unitPrice" BETWEEN -1000000000 AND 1000000000),
   ADD CONSTRAINT "QuoteItem_taxRate_allowed"    CHECK ("taxRate" IN (8, 10));
 
 ALTER TABLE "ContractItem"
-  ADD CONSTRAINT "ContractItem_quantity_positive" CHECK ("quantity" > 0),
+  ADD CONSTRAINT "ContractItem_quantity_positive" CHECK ("quantity" > 0 AND "quantity" <= 100000),
   ADD CONSTRAINT "ContractItem_unitPrice_range"    CHECK ("unitPrice" BETWEEN -1000000000 AND 1000000000),
   ADD CONSTRAINT "ContractItem_taxRate_allowed"   CHECK ("taxRate" IN (8, 10));
 
 ALTER TABLE "InvoiceItem"
-  ADD CONSTRAINT "InvoiceItem_quantity_positive" CHECK ("quantity" > 0),
+  ADD CONSTRAINT "InvoiceItem_quantity_positive" CHECK ("quantity" > 0 AND "quantity" <= 100000),
   ADD CONSTRAINT "InvoiceItem_unitPrice_range"    CHECK ("unitPrice" BETWEEN -1000000000 AND 1000000000),
   ADD CONSTRAINT "InvoiceItem_taxRate_allowed"   CHECK ("taxRate" IN (8, 10));
 
@@ -47,9 +48,21 @@ ALTER TABLE "Organization"
 -- 1. 明細行の amount を quantity * unitPrice で上書きする
 -- ─────────────────────────────
 
+-- 数量は小数(半日単位・時間単位の請求に対応)。数量 × 単価 が小数になる場合は
+-- ゼロ方向に切り捨てて円単位の整数にする。floor ではなく trunc を使うのは、
+-- 値引き行(単価がマイナス)で floor すると値引き額が勝手に1円増えるため。
+--   例: 7.5時間 × 3,333円 = 24,997.5 → 24,997
+--       値引き -24,997.5 → -24,997(floor なら -24,998 になってしまう)
 CREATE OR REPLACE FUNCTION segrr_set_item_amount() RETURNS TRIGGER AS $$
+DECLARE
+  raw NUMERIC;
 BEGIN
-  NEW."amount" := NEW."quantity" * NEW."unitPrice";
+  raw := NEW."quantity" * NEW."unitPrice";
+  IF abs(raw) > 2000000000 THEN
+    RAISE EXCEPTION
+      '明細の金額(%)が扱える上限を超えています。数量または単価を見直してください。', trunc(raw);
+  END IF;
+  NEW."amount" := trunc(raw)::INTEGER;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

@@ -19,6 +19,11 @@
 //   Quote/Contract/Invoice の subtotal10, tax10, subtotal8, tax8,
 //                            subtotal, taxAmount, totalAmount
 //   Invoice.withholdingTax, Invoice.paymentAmount
+//
+// 明細の quantity は小数(半日単位・時間単位の請求に対応するため Decimal(10,2))。
+// amount = 数量 × 単価 が小数になる場合は、DBトリガーがゼロ方向に切り捨てて円単位の整数にする。
+// 切り上げでも切り捨て(floor)でもなくゼロ方向にするのは、値引き行(単価がマイナス)で
+// 値引き額が勝手に増えないようにするため。
 // トリガー定義とテナント整合性チェックは docs/db-constraints.sql を参照。
 
 // Prisma 7 以降、接続URLはスキーマではなく prisma.config.ts に置き、
@@ -314,7 +319,7 @@ model QuoteItem {
   quoteId     String
   name        String
   description String?
-  quantity    Int     @default(1)
+  quantity    Decimal @default(1) @db.Decimal(10, 2) // 0.5人日 / 7.5時間 など小数可
   unit        String? // 単位(式 / 個 / 人日 / 時間 など)
   unitPrice   Int     // 税抜単価。値引き行はマイナスで入力する(デザイン仕様)
   taxRate     Int     @default(10) // 10 または 8
@@ -377,7 +382,7 @@ model ContractItem {
   sourceQuoteItemId String? // 継承元の見積明細(追跡用)
   name              String
   description       String?
-  quantity          Int     @default(1)
+  quantity          Decimal @default(1) @db.Decimal(10, 2)
   unit              String? // 単位(式 / 個 / 人日 / 時間 など)
   unitPrice         Int     // 税抜単価。値引き行はマイナス
   taxRate           Int     @default(10)
@@ -450,7 +455,7 @@ model InvoiceItem {
   invoiceId   String
   name        String
   description String?
-  quantity    Int     @default(1)
+  quantity    Decimal @default(1) @db.Decimal(10, 2) // 0.5人日 / 7.5時間 など小数可
   unit        String? // 単位(式 / 個 / 人日 / 時間 など)
   unitPrice   Int     // 税抜単価。値引き行はマイナス
   taxRate     Int     @default(10)

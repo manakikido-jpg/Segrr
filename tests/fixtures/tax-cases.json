@@ -10,74 +10,331 @@
     {
       "name": "10%のみ",
       "rounding": "FLOOR",
-      "items": [{ "quantity": 2, "unitPrice": 500, "taxRate": 10 }],
-      "expected": { "subtotal10": 1000, "tax10": 100, "subtotal8": 0, "tax8": 0, "subtotal": 1000, "taxAmount": 100, "totalAmount": 1100 }
+      "items": [
+        {
+          "quantity": 2,
+          "unitPrice": 500,
+          "taxRate": 10
+        }
+      ],
+      "expected": {
+        "subtotal10": 1000,
+        "tax10": 100,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 1000,
+        "taxAmount": 100,
+        "totalAmount": 1100
+      }
     },
     {
       "name": "10%と8%の混在。8%対象999円の端数は書類単位で1回だけ丸める(行ごとなら78円になる)",
       "rounding": "FLOOR",
       "items": [
-        { "quantity": 2, "unitPrice": 500, "taxRate": 10 },
-        { "quantity": 1, "unitPrice": 333, "taxRate": 8 },
-        { "quantity": 1, "unitPrice": 333, "taxRate": 8 },
-        { "quantity": 1, "unitPrice": 333, "taxRate": 8 }
+        {
+          "quantity": 2,
+          "unitPrice": 500,
+          "taxRate": 10
+        },
+        {
+          "quantity": 1,
+          "unitPrice": 333,
+          "taxRate": 8
+        },
+        {
+          "quantity": 1,
+          "unitPrice": 333,
+          "taxRate": 8
+        },
+        {
+          "quantity": 1,
+          "unitPrice": 333,
+          "taxRate": 8
+        }
       ],
-      "expected": { "subtotal10": 1000, "tax10": 100, "subtotal8": 999, "tax8": 79, "subtotal": 1999, "taxAmount": 179, "totalAmount": 2178 }
+      "expected": {
+        "subtotal10": 1000,
+        "tax10": 100,
+        "subtotal8": 999,
+        "tax8": 79,
+        "subtotal": 1999,
+        "taxAmount": 179,
+        "totalAmount": 2178
+      }
     },
     {
       "name": "端数が0.5未満(8.08円)。FLOOR",
       "rounding": "FLOOR",
-      "items": [{ "quantity": 1, "unitPrice": 101, "taxRate": 8 }],
-      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 101, "tax8": 8, "subtotal": 101, "taxAmount": 8, "totalAmount": 109 }
+      "items": [
+        {
+          "quantity": 1,
+          "unitPrice": 101,
+          "taxRate": 8
+        }
+      ],
+      "expected": {
+        "subtotal10": 0,
+        "tax10": 0,
+        "subtotal8": 101,
+        "tax8": 8,
+        "subtotal": 101,
+        "taxAmount": 8,
+        "totalAmount": 109
+      }
     },
     {
       "name": "端数が0.5未満(8.08円)。ROUND は切り捨てと同じ",
       "rounding": "ROUND",
-      "items": [{ "quantity": 1, "unitPrice": 101, "taxRate": 8 }],
-      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 101, "tax8": 8, "subtotal": 101, "taxAmount": 8, "totalAmount": 109 }
+      "items": [
+        {
+          "quantity": 1,
+          "unitPrice": 101,
+          "taxRate": 8
+        }
+      ],
+      "expected": {
+        "subtotal10": 0,
+        "tax10": 0,
+        "subtotal8": 101,
+        "tax8": 8,
+        "subtotal": 101,
+        "taxAmount": 8,
+        "totalAmount": 109
+      }
     },
     {
       "name": "端数が0.5未満(8.08円)。CEIL は切り上げ",
       "rounding": "CEIL",
-      "items": [{ "quantity": 1, "unitPrice": 101, "taxRate": 8 }],
-      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 101, "tax8": 9, "subtotal": 101, "taxAmount": 9, "totalAmount": 110 }
+      "items": [
+        {
+          "quantity": 1,
+          "unitPrice": 101,
+          "taxRate": 8
+        }
+      ],
+      "expected": {
+        "subtotal10": 0,
+        "tax10": 0,
+        "subtotal8": 101,
+        "tax8": 9,
+        "subtotal": 101,
+        "taxAmount": 9,
+        "totalAmount": 110
+      }
     },
     {
       "name": "端数が0.5以上(8.56円)。ROUND は切り上がる",
       "rounding": "ROUND",
-      "items": [{ "quantity": 1, "unitPrice": 107, "taxRate": 8 }],
-      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 107, "tax8": 9, "subtotal": 107, "taxAmount": 9, "totalAmount": 116 }
+      "items": [
+        {
+          "quantity": 1,
+          "unitPrice": 107,
+          "taxRate": 8
+        }
+      ],
+      "expected": {
+        "subtotal10": 0,
+        "tax10": 0,
+        "subtotal8": 107,
+        "tax8": 9,
+        "subtotal": 107,
+        "taxAmount": 9,
+        "totalAmount": 116
+      }
     },
     {
       "name": "端数が0.5以上(8.56円)。FLOOR は切り捨てのまま",
       "rounding": "FLOOR",
-      "items": [{ "quantity": 1, "unitPrice": 107, "taxRate": 8 }],
-      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 107, "tax8": 8, "subtotal": 107, "taxAmount": 8, "totalAmount": 115 }
+      "items": [
+        {
+          "quantity": 1,
+          "unitPrice": 107,
+          "taxRate": 8
+        }
+      ],
+      "expected": {
+        "subtotal10": 0,
+        "tax10": 0,
+        "subtotal8": 107,
+        "tax8": 8,
+        "subtotal": 107,
+        "taxAmount": 8,
+        "totalAmount": 115
+      }
     },
     {
       "name": "値引き行(単価がマイナス)。同じ税率の課税対象から差し引く",
       "rounding": "FLOOR",
       "items": [
-        { "quantity": 1, "unitPrice": 100000, "taxRate": 10 },
-        { "quantity": 1, "unitPrice": -10000, "taxRate": 10 }
+        {
+          "quantity": 1,
+          "unitPrice": 100000,
+          "taxRate": 10
+        },
+        {
+          "quantity": 1,
+          "unitPrice": -10000,
+          "taxRate": 10
+        }
       ],
-      "expected": { "subtotal10": 90000, "tax10": 9000, "subtotal8": 0, "tax8": 0, "subtotal": 90000, "taxAmount": 9000, "totalAmount": 99000 }
+      "expected": {
+        "subtotal10": 90000,
+        "tax10": 9000,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 90000,
+        "taxAmount": 9000,
+        "totalAmount": 99000
+      }
     },
     {
       "name": "工数行(数量5・単価80,000)と値引きの混在",
       "rounding": "FLOOR",
       "items": [
-        { "quantity": 1, "unitPrice": 500000, "taxRate": 10 },
-        { "quantity": 5, "unitPrice": 80000, "taxRate": 10 },
-        { "quantity": 1, "unitPrice": -50000, "taxRate": 10 }
+        {
+          "quantity": 1,
+          "unitPrice": 500000,
+          "taxRate": 10
+        },
+        {
+          "quantity": 5,
+          "unitPrice": 80000,
+          "taxRate": 10
+        },
+        {
+          "quantity": 1,
+          "unitPrice": -50000,
+          "taxRate": 10
+        }
       ],
-      "expected": { "subtotal10": 850000, "tax10": 85000, "subtotal8": 0, "tax8": 0, "subtotal": 850000, "taxAmount": 85000, "totalAmount": 935000 }
+      "expected": {
+        "subtotal10": 850000,
+        "tax10": 85000,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 850000,
+        "taxAmount": 85000,
+        "totalAmount": 935000
+      }
     },
     {
       "name": "明細なし",
       "rounding": "FLOOR",
       "items": [],
-      "expected": { "subtotal10": 0, "tax10": 0, "subtotal8": 0, "tax8": 0, "subtotal": 0, "taxAmount": 0, "totalAmount": 0 }
+      "expected": {
+        "subtotal10": 0,
+        "tax10": 0,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 0,
+        "taxAmount": 0,
+        "totalAmount": 0
+      }
+    },
+    {
+      "name": "半日単位の工数(0.5人日 × 80,000円)",
+      "rounding": "FLOOR",
+      "items": [
+        {
+          "quantity": 0.5,
+          "unitPrice": 80000,
+          "taxRate": 10
+        }
+      ],
+      "expected": {
+        "subtotal10": 40000,
+        "tax10": 4000,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 40000,
+        "taxAmount": 4000,
+        "totalAmount": 44000
+      }
+    },
+    {
+      "name": "時間単位で金額が小数になる(7.5時間 × 3,333円 = 24,997.5 → 切り捨て 24,997)",
+      "rounding": "FLOOR",
+      "items": [
+        {
+          "quantity": 7.5,
+          "unitPrice": 3333,
+          "taxRate": 10
+        }
+      ],
+      "expected": {
+        "subtotal10": 24997,
+        "tax10": 2499,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 24997,
+        "taxAmount": 2499,
+        "totalAmount": 27496
+      }
+    },
+    {
+      "name": "15分単位(0.25時間 × 3,333円 = 833.25 → 切り捨て 833)",
+      "rounding": "FLOOR",
+      "items": [
+        {
+          "quantity": 0.25,
+          "unitPrice": 3333,
+          "taxRate": 10
+        }
+      ],
+      "expected": {
+        "subtotal10": 833,
+        "tax10": 83,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 833,
+        "taxAmount": 83,
+        "totalAmount": 916
+      }
+    },
+    {
+      "name": "小数の値引き行はゼロ方向に切り捨てる(-24,997.5 → -24,997。floor なら -24,998 になる)",
+      "rounding": "FLOOR",
+      "items": [
+        {
+          "quantity": 1,
+          "unitPrice": 100000,
+          "taxRate": 10
+        },
+        {
+          "quantity": 7.5,
+          "unitPrice": -3333,
+          "taxRate": 10
+        }
+      ],
+      "expected": {
+        "subtotal10": 75003,
+        "tax10": 7500,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 75003,
+        "taxAmount": 7500,
+        "totalAmount": 82503
+      }
+    },
+    {
+      "name": "浮動小数点の誤差が出やすい数量(1.15 × 100 は 114.99999... になる)",
+      "rounding": "FLOOR",
+      "items": [
+        {
+          "quantity": 1.15,
+          "unitPrice": 100,
+          "taxRate": 10
+        }
+      ],
+      "expected": {
+        "subtotal10": 115,
+        "tax10": 11,
+        "subtotal8": 0,
+        "tax8": 0,
+        "subtotal": 115,
+        "taxAmount": 11,
+        "totalAmount": 126
+      }
     }
   ],
   "_withholdingComment": [
@@ -85,15 +342,45 @@
     "100万円以下は 10.21%、100万円超は超過分 20.42% + 102,100円。いずれも円未満切り捨て。"
   ],
   "withholdingCases": [
-    { "base": 0, "expected": 0 },
-    { "base": 1, "expected": 0 },
-    { "base": 10000, "expected": 1021 },
-    { "base": 99999, "expected": 10209 },
-    { "base": 999999, "expected": 102099 },
-    { "base": 1000000, "expected": 102100 },
-    { "base": 1000001, "expected": 102100 },
-    { "base": 1000050, "expected": 102110 },
-    { "base": 2000000, "expected": 306300 },
-    { "base": 12345678, "expected": 2418887 }
+    {
+      "base": 0,
+      "expected": 0
+    },
+    {
+      "base": 1,
+      "expected": 0
+    },
+    {
+      "base": 10000,
+      "expected": 1021
+    },
+    {
+      "base": 99999,
+      "expected": 10209
+    },
+    {
+      "base": 999999,
+      "expected": 102099
+    },
+    {
+      "base": 1000000,
+      "expected": 102100
+    },
+    {
+      "base": 1000001,
+      "expected": 102100
+    },
+    {
+      "base": 1000050,
+      "expected": 102110
+    },
+    {
+      "base": 2000000,
+      "expected": 306300
+    },
+    {
+      "base": 12345678,
+      "expected": 2418887
+    }
   ]
 }
