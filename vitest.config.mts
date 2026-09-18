@@ -10,6 +10,11 @@ export default defineConfig({
     setupFiles: ['dotenv/config'],
   },
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // server-only は読み込まれると例外を投げる。サービス層の保護は本番に残しつつ、
+      // テストからは空モジュールに差し替える
+      'server-only': fileURLToPath(new URL('./tests/stubs/server-only.ts', import.meta.url)),
+    },
   },
 })

@@ -3,7 +3,10 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { ensureMemberships } from '@/server/auth/invitation'
-import type { MembershipRole } from '@/generated/prisma/client'
+import type { ActiveOrganization } from '@/server/auth/types'
+
+export { canWrite, assertCanWrite } from '@/server/auth/types'
+export type { ActiveOrganization } from '@/server/auth/types'
 
 /**
  * 認可の集約点(Next.js のガイドが言う Data Access Layer)。
@@ -20,13 +23,6 @@ import type { MembershipRole } from '@/generated/prisma/client'
  * Phase 0 は「1ユーザー1組織」の固定運用(要件定義書セクション2)。複数組織に
  * 所属した場合は作成順で最初の1つを使う。組織切り替えUIは Phase 3。
  */
-
-export type ActiveOrganization = {
-  userId: string
-  organizationId: string
-  role: MembershipRole
-  organizationName: string
-}
 
 /** ログイン済みのユーザー。未ログインなら null。 */
 export const getCurrentUser = cache(
@@ -107,19 +103,4 @@ export async function requireOrganization(): Promise<ActiveOrganization> {
   return active
 }
 
-/**
- * 書き込み権限があるか。VIEWER は読み取りのみ。
- *
- * Phase 0 ではロールを付け替えるUIは作らない(シードで固定)。
- * 権限UIを作り込むとスコープが膨らむため(要件定義書セクション5・失敗パターン11)。
- */
-export function canWrite(role: MembershipRole): boolean {
-  return role === 'OWNER' || role === 'MEMBER'
-}
 
-/** 書き込みが必要な処理で使う。VIEWER なら例外にする。 */
-export function assertCanWrite(active: ActiveOrganization): void {
-  if (!canWrite(active.role)) {
-    throw new Error('この操作を行う権限がありません(閲覧のみのユーザーです)')
-  }
-}

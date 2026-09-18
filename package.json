@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "node scripts/clean-route-types.mjs && next typegen && tsc --noEmit",
     "test": "vitest run --exclude \"tests/unit/*-db.test.ts\" --exclude tests/unit/auth-invitation.test.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -15,12 +15,13 @@
     "db:deploy": "prisma migrate deploy && prisma generate",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "db:verify": "psql \"$DATABASE_URL\" -f tests/db/verify-constraints.sql",
+    "db:verify": "node scripts/verify-db-constraints.mjs",
     "db:reset": "prisma migrate reset --force",
     "db:check": "tsx scripts/check-db.ts",
-    "test:db": "vitest run tests/unit/tax-db.test.ts tests/unit/auth-invitation.test.ts",
+    "test:db": "vitest run tests/unit/tax-db.test.ts tests/unit/auth-invitation.test.ts tests/unit/customer-service.test.ts",
     "pdf:sample": "tsx scripts/pdf-sample.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "smoke": "tsx scripts/ui-smoke.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -37,6 +38,7 @@
     "playwright-core": "^1.63.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "server-only": "^0.0.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {

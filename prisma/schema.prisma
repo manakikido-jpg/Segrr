@@ -233,6 +233,10 @@ model Customer {
 
   // この顧客への請求で源泉徴収を既定でONにするか(請求書ごとに上書き可能)
   withholdingDefault Boolean @default(false)
+
+  // 帳票の宛名に付ける敬称。法人は「御中」、個人は「様」。
+  // 適格請求書の必須項目「交付先の名称」に関わるため、B4の帳票より前に持たせる
+  honorific String @default("御中")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt @default(now())
 

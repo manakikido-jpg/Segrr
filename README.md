@@ -120,7 +120,9 @@ psql -U postgres -c "CREATE DATABASE seggr"
 |---|---|
 | `npm run dev` / `build` / `start` | Next.js |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Vitest(ユニットテスト) |
+| `npm test` | Vitest(DBを使わないユニットテスト) |
+| `npm run test:db` | 実DBに対するテスト(税額の突き合わせ・招待制・テナント境界) |
+| `npm run smoke` | 実際の画面で顧客管理が動くかを確認(要: 開発サーバー起動) |
 | `npm run test:e2e` | Playwright |
 | `npm run db:migrate` | マイグレーション作成・適用 + Prisma Client 再生成(開発) |
 | `npm run db:deploy` | マイグレーション適用のみ(本番) |
@@ -156,6 +158,16 @@ psql "postgresql://.../seggr_test" -f tests/db/verify-constraints.sql
 ```
 
 47項目すべてが `✓ PASS` になること。これがタスクA2の完了条件。
+`npm run db:verify` でも同じことができる(接続先は `.env` から読む)。
+
+### 画面の動作確認
+
+`npm run smoke` は、開発サーバーに対して実際にブラウザを動かし、顧客の
+作成・検索・編集・削除・エラー表示・テナント分離を確認する。
+
+Googleログインは自動化できないため、Auth.js のデータベースセッション方式を利用して
+`Session` 行を直接作り、その Cookie を載せて操作する。認証の判定そのものは
+`npm run test:db` の招待制テストが担当している。
 
 ## 開発の進め方
 
