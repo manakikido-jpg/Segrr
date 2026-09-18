@@ -61,6 +61,24 @@ async function main() {
   const other = await upsertOrganization('検証用の別組織')
   const otherOwner = await invite(other.id, OTHER_EMAIL, 'OWNER')
 
+  // .env から外したアドレスの招待は消す。残しておくと、使わなくなったアドレスで
+  // ログインできてしまう。シードは「あるべき状態」を宣言するものとして扱う。
+  // 既に参加した人の Membership は消さない(招待は入場券であって会員証ではない)
+  for (const [org, keep] of [
+    [main, [OWNER_EMAIL, TESTER_EMAIL]],
+    [other, [OTHER_EMAIL]],
+  ] as const) {
+    const stale = await db.invitation.deleteMany({
+      where: {
+        organizationId: org.id,
+        email: { notIn: keep.filter((e): e is string => Boolean(e)) },
+      },
+    })
+    if (stale.count > 0) {
+      console.log(`  ${org.name}: 不要になった招待を${stale.count}件削除しました`)
+    }
+  }
+
   // 組織ごとに顧客を1件ずつ作り、組織をまたいで見えないことを確認できるようにする
   for (const [org, customerName] of [
     [main, '株式会社サンプル商事'],
