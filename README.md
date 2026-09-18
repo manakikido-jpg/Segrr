@@ -31,10 +31,39 @@ npm run dev              # http://localhost:3000
 
 | 変数 | 用途 | 取得方法 |
 |---|---|---|
-| `DATABASE_URL` | PostgreSQL 接続文字列 | ローカルは `postgresql://<user>:<pass>@localhost:5432/segrr` |
+| `DATABASE_URL` | PostgreSQL 接続文字列 | 下記「データベースの用意」を参照 |
 | `AUTH_SECRET` | Auth.js のセッション署名鍵 | `openssl rand -base64 32` |
 | `AUTH_GOOGLE_ID` | Google OAuth クライアントID | Google Cloud Console → 認証情報 → OAuth 2.0 クライアント |
 | `AUTH_GOOGLE_SECRET` | 同シークレット | 同上 |
+
+### データベースの用意
+
+PostgreSQL 16 以降であれば動く(18 でも全テストが通ることを確認済み)。
+次のどちらでもよい。
+
+**A. クラウドの PostgreSQL(推奨。インストール不要)**
+
+[Neon](https://neon.com) や [Supabase](https://supabase.com) でプロジェクトを作り、
+表示された接続文字列をそのまま `DATABASE_URL` に貼る。SSL は追加設定なしで通る
+(`sslmode=require` は証明書検証つきで解釈される)。
+
+```
+DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
+```
+
+**B. ローカルにインストール**
+
+[postgresql.org](https://www.postgresql.org/download/) から導入する。
+Windows のインストーラでは、コンポーネント選択で **PostgreSQL Server** に
+チェックが入っているか確認すること(Command Line Tools だけだと
+`psql` は使えてもサーバーが無く、接続が拒否される)。
+
+```
+psql -U postgres -c "CREATE DATABASE segrr"
+```
+
+パスワードに `@ # / : ?` が含まれる場合は、`DATABASE_URL` の中で
+パーセントエンコードが必要(`@` → `%40` など)。
 
 ### Google OAuth の設定
 
