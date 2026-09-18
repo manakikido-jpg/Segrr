@@ -44,12 +44,23 @@ PostgreSQL 16 以降であれば動く(18 でも全テストが通ることを�
 **A. クラウドの PostgreSQL(推奨。インストール不要)**
 
 [Neon](https://neon.com) や [Supabase](https://supabase.com) でプロジェクトを作り、
-表示された接続文字列をそのまま `DATABASE_URL` に貼る。SSL は追加設定なしで通る
+表示された接続文字列を `DATABASE_URL` に貼る。SSL は追加設定なしで通る
 (`sslmode=require` は証明書検証つきで解釈される)。
 
 ```
 DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
 ```
+
+**接続プール(PgBouncer)を挟む場合は注意。** Neon の `-pooler` 付きホストのように
+プール経由の接続では、Prisma のマイグレーションが使うセッションレベルの
+アドバイザリロックが効かず、失敗したり中途半端に適用されたりする。
+その場合は `DIRECT_DATABASE_URL` にプールを通さない接続を設定する
+(Neon ならホスト名から `-pooler` を取り除いたもの)。マイグレーションだけが
+そちらを使い、アプリの実行時は `DATABASE_URL` を使う。
+
+Phase 0 は利用者が2人なのでプールは不要。`DATABASE_URL` に直接接続を入れて
+`DIRECT_DATABASE_URL` は空のままでよい。Vercel のようなサーバーレスに
+デプロイして同時接続が増えたら、実行時だけプール経由に切り替える。
 
 **B. ローカルにインストール**
 
