@@ -19,7 +19,8 @@
     "db:reset": "prisma migrate reset --force",
     "db:check": "tsx scripts/check-db.ts",
     "test:db": "vitest run tests/unit/tax-db.test.ts tests/unit/auth-invitation.test.ts",
-    "pdf:sample": "tsx scripts/pdf-sample.ts"
+    "pdf:sample": "tsx scripts/pdf-sample.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

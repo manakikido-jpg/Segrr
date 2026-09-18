@@ -20,12 +20,16 @@
 ## セットアップ
 
 ```bash
-npm install
+npm install              # Prisma Client も自動生成される(postinstall)
 cp .env.example .env     # 値を埋める(下表参照)
 npm run db:migrate       # マイグレーション適用
+npm run db:seed          # 開発用データの投入
 npm run db:check         # 接続とトリガーの疎通確認
 npm run dev              # http://localhost:3000
 ```
+
+`src/generated/` は Git 管理外(スキーマから生成されるため)。
+`Can't resolve '@/generated/prisma/client'` が出たら `npx prisma generate` で復旧する。
 
 ### 環境変数
 

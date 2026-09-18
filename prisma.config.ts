@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { defineConfig, env } from 'prisma/config'
+import { defineConfig } from 'prisma/config'
 
 // Prisma 7 以降、マイグレーション用の接続URLはスキーマではなくここに置く。
 // アプリ実行時の接続は src/lib/db.ts のドライバアダプタが担当する。
@@ -18,6 +18,11 @@ export default defineConfig({
     seed: 'tsx prisma/seed.ts',
   },
   datasource: {
-    url: process.env.DIRECT_DATABASE_URL ? env('DIRECT_DATABASE_URL') : env('DATABASE_URL'),
+    // env() ヘルパーは未設定だと即座に例外を投げるため使わない。
+    // postinstall の `prisma generate` は接続先を必要としないのに、
+    // .env を作る前の `npm install` が失敗してしまう。
+    // 接続が必要なコマンド(migrate / db seed)は、空文字のまま実行すれば
+    // Prisma 側が接続エラーとして分かりやすく知らせてくれる。
+    url: process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL ?? '',
   },
 })
