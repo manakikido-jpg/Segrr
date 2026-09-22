@@ -19,3 +19,6 @@ playwright-report/
 *.log
 src/generated/
 tmp/
+
+# デモ用のスクリーンショットと帳票の出力先(再生成できるためコミットしない)
+shots/
